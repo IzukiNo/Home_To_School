@@ -600,38 +600,70 @@ document.getElementById('addNodeBtn').addEventListener('click', async () => {
         }
         
         Graph.graphData(gData);
-    }
-    // Rule 2: After D, create branch nodes with weighted random connections
+    }    // Rule 2: After D, create branch nodes with diverse connections
     else {
-        // Calculate node priorities (prefer nodes closer to home or connected to school)
-        const nodePriorities = nonSchoolNodes.map(node => {
+        // Add the new node first (without connections)
+        addNode(nodeId, nodeName, nodeIcon, null, 1);
+        
+        // Lower chance to connect with Home (30% only - for diversity)
+        const connectToHome = Math.random() < 0.3; // Only 30% chance
+        
+        if (connectToHome) {
+            const homeToNode = Math.random() < 0.8; // 80% Home -> Node, 20% Node -> Home
+            const homeWeight = Math.floor(Math.random() * 20) + 1;
+            
+            if (homeToNode) {
+                gData.links.push({
+                    source: 'home',
+                    target: nodeId,
+                    weight: homeWeight
+                });
+            } else {
+                gData.links.push({
+                    source: nodeId,
+                    target: 'home',
+                    weight: homeWeight
+                });
+            }
+        }
+        
+        // Calculate priorities for connections - FOCUS ON OTHER NODES, NOT HOME
+        const possibleTargets = [
+            ...nonSchoolNodes.filter(n => n.id !== 'home'), // Exclude Home
+            gData.nodes.find(n => n.id === 'school')
+        ];
+        
+        const targetPriorities = possibleTargets.map(node => {
             let priority = 1;
             
-            // Higher priority for home
-            if (node.id === 'home') priority = 3;
+            // HIGH priority for School (to ensure paths to School exist)
+            if (node.id === 'school') priority = 3;
             
-            // Higher priority for nodes in main path (connected to school)
-            const connectedToSchool = gData.links.some(link => {
-                const sourceId = typeof link.source === 'object' ? link.source.id : link.source;
-                const targetId = typeof link.target === 'object' ? link.target.id : link.target;
-                return (sourceId === node.id && targetId === 'school') ||
-                       (targetId === node.id && sourceId === 'school');
-            });
-            if (connectedToSchool) priority = 2.5;
-            
-            // Count existing connections (prefer less connected nodes for balance)
-            const connectionCount = gData.links.filter(link => {
-                const sourceId = typeof link.source === 'object' ? link.source.id : link.source;
-                const targetId = typeof link.target === 'object' ? link.target.id : link.target;
-                return sourceId === node.id || targetId === node.id;
-            }).length;
-            
-            if (connectionCount < 3) priority += 0.5;
+            // HIGHER priority for other random nodes (creates diverse paths)
+            else {
+                // Prefer nodes in main path
+                const connectedToSchool = gData.links.some(link => {
+                    const sourceId = typeof link.source === 'object' ? link.source.id : link.source;
+                    const targetId = typeof link.target === 'object' ? link.target.id : link.target;
+                    return (sourceId === node.id && targetId === 'school') ||
+                           (targetId === node.id && sourceId === 'school');
+                });
+                if (connectedToSchool) priority = 2.5;
+                
+                // Prefer less connected nodes (balance the graph)
+                const connectionCount = gData.links.filter(link => {
+                    const sourceId = typeof link.source === 'object' ? link.source.id : link.source;
+                    const targetId = typeof link.target === 'object' ? link.target.id : link.target;
+                    return sourceId === node.id || targetId === node.id;
+                }).length;
+                
+                if (connectionCount < 3) priority += 1; // Significant boost for less connected
+            }
             
             return { node, priority };
         });
         
-        // Weighted random selection function
+        // Weighted random selection
         const weightedRandom = (items) => {
             const totalPriority = items.reduce((sum, item) => sum + item.priority, 0);
             let random = Math.random() * totalPriority;
@@ -643,62 +675,54 @@ document.getElementById('addNodeBtn').addEventListener('click', async () => {
             return items[items.length - 1].node;
         };
         
-        // Determine number of connections (1-3)
-        let numConnections = 1;
+        // Determine number of connections (2-3 for more diversity)
+        let numConnections = 2;
         const rand = Math.random();
-        if (rand < 0.5) numConnections = 1;      // 50% chance
-        else if (rand < 0.85) numConnections = 2; // 35% chance
-        else numConnections = 3;                  // 15% chance
+        if (rand < 0.4) numConnections = 2;      // 40% chance - connect to 2 nodes
+        else if (rand < 0.8) numConnections = 3; // 40% chance - connect to 3 nodes
+        else numConnections = 1;                 // 20% chance - only 1 connection
         
-        // Limit connections based on available nodes
-        numConnections = Math.min(numConnections, nonSchoolNodes.length);
+        numConnections = Math.min(numConnections, targetPriorities.length);
         
         // Select target nodes
-        const selectedNodes = [];
-        const availableNodes = [...nodePriorities];
+        const selectedTargets = [];
+        const availableTargets = [...targetPriorities];
         
         for (let i = 0; i < numConnections; i++) {
-            if (availableNodes.length === 0) break;
+            if (availableTargets.length === 0) break;
             
-            const targetNode = weightedRandom(availableNodes);
-            selectedNodes.push(targetNode.id);
+            const targetNode = weightedRandom(availableTargets);
+            selectedTargets.push(targetNode.id);
             
             // Remove selected node from available pool
-            const index = availableNodes.findIndex(item => item.node.id === targetNode.id);
-            if (index !== -1) availableNodes.splice(index, 1);
+            const index = availableTargets.findIndex(item => item.node.id === targetNode.id);
+            if (index !== -1) availableTargets.splice(index, 1);
         }
         
-        // Add the new node (connected to first selected node)
-        const firstWeight = Math.floor(Math.random() * 20) + 1;
-        addNode(nodeId, nodeName, nodeIcon, selectedNodes[0], firstWeight);
-        
-        // Add additional connections
-        for (let i = 1; i < selectedNodes.length; i++) {
-            // Check if link already exists
+        // Create DIRECTED links: New Node -> Target Nodes
+        selectedTargets.forEach(targetId => {
             const linkExists = gData.links.some(link => {
                 const sourceId = typeof link.source === 'object' ? link.source.id : link.source;
-                const targetId = typeof link.target === 'object' ? link.target.id : link.target;
-                return (sourceId === nodeId && targetId === selectedNodes[i]) ||
-                       (targetId === nodeId && sourceId === selectedNodes[i]);
+                const linkTargetId = typeof link.target === 'object' ? link.target.id : link.target;
+                return sourceId === nodeId && linkTargetId === targetId;
             });
             
             if (!linkExists) {
                 gData.links.push({
                     source: nodeId,
-                    target: selectedNodes[i],
+                    target: targetId,
                     weight: Math.floor(Math.random() * 20) + 1
                 });
             }
-        }
+        });
         
         Graph.graphData(gData);
         
-        // Clear debug log
-        if (selectedNodes.length === 1) {
-            console.log(`Branch node: ${nodeId} connected to ${selectedNodes[0]}`);
-        } else {
-            console.log(`Branch node: ${nodeId} connected to ${selectedNodes.join(', ')}`);
-        }
+        // Log the connections
+        const homeConnection = connectToHome ? 
+            (Math.random() < 0.8 ? `home → ${nodeId}` : `${nodeId} → home`) : 
+            'no home link';
+        console.log(`Branch node: ${homeConnection} | ${nodeId} → [${selectedTargets.join(', ')}]`);
     }
     
     nextChar = String.fromCharCode(nextChar.charCodeAt(0) + 1);
