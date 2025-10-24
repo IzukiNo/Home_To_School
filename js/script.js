@@ -398,6 +398,41 @@ const Graph = new ForceGraph(document.getElementById('graph'))
         ctx.fillText(label, textPos.x, textPos.y);
     });
 
+// Auto zoom out on mobile devices
+function setInitialZoom() {
+    // Detect if device is mobile
+    const isMobile = window.innerWidth <= 768;
+    
+    if (isMobile) {
+        // Calculate zoom level based on screen width
+        let zoomLevel;
+        if (window.innerWidth <= 480) {
+            // Small mobile phones
+            zoomLevel = 1.3;
+        } else if (window.innerWidth <= 768) {
+            // Tablets and larger phones
+            zoomLevel = 2;
+        }
+        
+        // Apply zoom with a slight delay to ensure graph is initialized
+        setTimeout(() => {
+            Graph.zoom(zoomLevel, 400); // 400ms animation duration
+        }, 100);
+    }
+}
+
+// Call initial zoom after graph is loaded
+setInitialZoom();
+
+// Re-adjust zoom on window resize (orientation change on mobile)
+let resizeTimeout;
+window.addEventListener('resize', () => {
+    clearTimeout(resizeTimeout);
+    resizeTimeout = setTimeout(() => {
+        setInitialZoom();
+    }, 300);
+});
+
 function updateForces() {
     const nodeCount = gData.nodes.length;
 

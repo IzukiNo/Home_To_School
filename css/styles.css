@@ -2,6 +2,9 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    /* Prevent blue highlight on tap (mobile) */
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
 }
 
 html,
@@ -10,6 +13,11 @@ body {
     height: 100%;
     overflow: hidden;
     font-family: Arial, sans-serif;
+    /* Prevent text selection on canvas */
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 }
 
 /* Collapsible Toolbar */
@@ -183,6 +191,24 @@ body {
     left: 0;
     width: 100vw;
     height: 100vh;
+    /* Prevent blue highlight on mobile tap */
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    /* Prevent context menu on long press */
+    touch-action: pan-x pan-y;
+}
+
+#graph canvas {
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 }
 
 /* Custom Popup Styles */
@@ -252,6 +278,11 @@ body {
     outline: none;
     transition: border-color 0.3s ease;
     font-family: Arial, sans-serif;
+    /* Allow text selection in inputs */
+    -webkit-user-select: text;
+    -moz-user-select: text;
+    -ms-user-select: text;
+    user-select: text;
 }
 
 .popup-input:focus {
@@ -269,6 +300,11 @@ body {
     font-family: 'Courier New', monospace;
     resize: vertical;
     line-height: 1.5;
+    /* Allow text selection in textarea */
+    -webkit-user-select: text;
+    -moz-user-select: text;
+    -ms-user-select: text;
+    user-select: text;
 }
 
 .popup-textarea:focus {
