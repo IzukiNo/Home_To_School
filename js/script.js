@@ -215,6 +215,11 @@ function drawNode(node, ctx, globalScale) {
     }
 }
 
+// Grid configuration
+const GRID_SIZE = 50; // Size of each grid cell
+const GRID_COLOR = 'rgba(200, 200, 200, 0.3)'; // Light gray grid
+const GRID_THICK_COLOR = 'rgba(150, 150, 150, 0.5)'; // Darker grid every 5 lines
+
 const Graph = new ForceGraph(document.getElementById('graph'))
     .graphData(gData)
     .nodeLabel('name')
@@ -229,7 +234,58 @@ const Graph = new ForceGraph(document.getElementById('graph'))
     .onLinkHover(link => {
         hoverLink = link || null;
         document.getElementById('graph').style.cursor = link ? 'pointer' : 'default';
-    })    .onNodeClick(node => {
+    })
+    // Add background grid that transforms with zoom/pan
+    .onRenderFramePre((ctx, globalScale) => {
+        // Get canvas dimensions
+        const width = ctx.canvas.width;
+        const height = ctx.canvas.height;
+        
+        // Get current transform (zoom and pan)
+        const transform = ctx.getTransform();
+        
+        // Calculate grid bounds in world coordinates
+        const topLeft = {
+            x: -transform.e / transform.a,
+            y: -transform.f / transform.d
+        };
+        const bottomRight = {
+            x: (width - transform.e) / transform.a,
+            y: (height - transform.f) / transform.d
+        };
+        
+        // Calculate grid line range
+        const startX = Math.floor(topLeft.x / GRID_SIZE) * GRID_SIZE;
+        const endX = Math.ceil(bottomRight.x / GRID_SIZE) * GRID_SIZE;
+        const startY = Math.floor(topLeft.y / GRID_SIZE) * GRID_SIZE;
+        const endY = Math.ceil(bottomRight.y / GRID_SIZE) * GRID_SIZE;
+        
+        // Draw vertical lines
+        for (let x = startX; x <= endX; x += GRID_SIZE) {
+            // Every 5th line is thicker
+            const isThickLine = (x / GRID_SIZE) % 5 === 0;
+            ctx.strokeStyle = isThickLine ? GRID_THICK_COLOR : GRID_COLOR;
+            ctx.lineWidth = isThickLine ? 2 / globalScale : 1 / globalScale;
+            
+            ctx.beginPath();
+            ctx.moveTo(x, startY);
+            ctx.lineTo(x, endY);
+            ctx.stroke();
+        }
+        
+        // Draw horizontal lines
+        for (let y = startY; y <= endY; y += GRID_SIZE) {
+            // Every 5th line is thicker
+            const isThickLine = (y / GRID_SIZE) % 5 === 0;
+            ctx.strokeStyle = isThickLine ? GRID_THICK_COLOR : GRID_COLOR;
+            ctx.lineWidth = isThickLine ? 2 / globalScale : 1 / globalScale;
+            
+            ctx.beginPath();
+            ctx.moveTo(startX, y);
+            ctx.lineTo(endX, y);
+            ctx.stroke();
+        }
+    }).onNodeClick(node => {
         // Nếu chưa có node nào được chọn, chọn node này làm node đầu tiên
         if (firstSelectedNode === null) {
             firstSelectedNode = node;
@@ -298,25 +354,17 @@ const Graph = new ForceGraph(document.getElementById('graph'))
             x: start.x + (end.x - start.x) / 2,
             y: start.y + (end.y - start.y) / 2
         };
-        
-        const label = link.weight || '';
+          const label = link.weight || '';
         const fontSize = 22/globalScale;
         ctx.font = `bold ${fontSize}px Sans-Serif`;
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         
-        // Draw background
-        const textWidth = ctx.measureText(label).width;
-        const bckgDimensions = [textWidth + 4, fontSize + 2];
+        // Draw text with white stroke for better visibility on grid
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.8)';
+        ctx.lineWidth = 3 / globalScale;
+        ctx.strokeText(label, textPos.x, textPos.y);
         
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
-        ctx.fillRect(
-            textPos.x - bckgDimensions[0] / 2,
-            textPos.y - bckgDimensions[1] / 2,
-            ...bckgDimensions
-        );
-        
-        // Draw text
         ctx.fillStyle = '#333';
         ctx.fillText(label, textPos.x, textPos.y);
     });

@@ -28,7 +28,6 @@ body {
     transform: translateY(-100%);
     opacity: 0;
     pointer-events: none;
-    margin-bottom: -80px;
 }
 
 .toolbar-content {
@@ -42,6 +41,7 @@ body {
     opacity: 1;
     transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
     transform: translateY(0);
+    margin-bottom: 0;
 }
 
 .toolbar-toggle {
@@ -62,7 +62,7 @@ body {
 }
 
 .toolbar.collapsed .toolbar-toggle {
-    transform: translateY(10px);
+    margin-top: -60px;
     box-shadow: 0 6px 18px rgba(99, 102, 241, 0.5);
 }
 
@@ -73,7 +73,7 @@ body {
 }
 
 .toolbar.collapsed .toolbar-toggle:hover {
-    transform: translateY(10px) scale(1.15);
+    transform: scale(1.15);
 }
 
 .toolbar-toggle:active {
@@ -82,7 +82,7 @@ body {
 }
 
 .toolbar.collapsed .toolbar-toggle:active {
-    transform: translateY(10px) scale(0.9);
+    transform: scale(0.9);
 }
 
 .toggle-icon {
@@ -375,6 +375,10 @@ body {
         height: 36px;
     }
 
+    .toolbar.collapsed .toolbar-toggle {
+        margin-top: -190px;
+    }
+
     .toggle-icon {
         width: 18px;
         height: 18px;
@@ -403,6 +407,10 @@ body {
     .toolbar-toggle {
         width: 32px;
         height: 32px;
+    }
+
+    .toolbar.collapsed .toolbar-toggle {
+        margin-top: -185px;
     }
 
     .toggle-icon {
