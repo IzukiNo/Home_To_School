@@ -54,7 +54,87 @@
             </svg>
         </button>
     </div>
-    <div id="graph"></div>
+    <div id="graph"></div> <!-- Help Panel Button (Bottom Right) -->
+    <button id="helpPanelToggle" class="help-panel-toggle" title="Help">
+        <svg viewBox="0 0 24 24" fill="currentColor">
+            <path
+                d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z" />
+        </svg>
+    </button>
+
+    <!-- Help Panel (Slides up from bottom right) -->
+    <div id="helpPanel" class="help-panel">
+        <div class="help-panel-header">
+            <h3>How to Use</h3>
+            <button id="helpPanelClose" class="help-panel-close" title="Close">×</button>
+        </div>
+        <div class="help-panel-content">
+            <div class="help-section">
+                <h4>
+                    <svg class="section-icon" viewBox="0 0 24 24" fill="currentColor">
+                        <path
+                            d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z" />
+                    </svg>
+                    Node Operations
+                </h4>
+                <ul>
+                    <li><strong>Add Node:</strong> Click the "Add Node" button to create a new location (A-Z)</li>
+                    <li><strong>Create Link:</strong> Click on two nodes to connect them</li>
+                    <li><strong>Remove Link:</strong> Click the same two nodes again to remove the connection</li>
+                    <li><strong>Drag Node:</strong> Click and drag any node to reposition it</li>
+                </ul>
+            </div>
+            <div class="help-section">
+                <h4>
+                    <svg class="section-icon" viewBox="0 0 24 24" fill="currentColor">
+                        <path
+                            d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z" />
+                    </svg>
+                    Link Operations
+                </h4>
+                <ul>
+                    <li><strong>Edit Weight:</strong> Double-click on any link to change its weight</li>
+                    <li><strong>Hover:</strong> Hover over links to highlight them</li>
+                </ul>
+            </div>
+            <div class="help-section">
+                <h4>
+                    <svg class="section-icon" viewBox="0 0 24 24" fill="currentColor">
+                        <path
+                            d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z" />
+                    </svg>
+                    Graph Management
+                </h4>
+                <ul>
+                    <li><strong>Import:</strong> Import an adjacency matrix (comma-separated values)</li>
+                    <li><strong>Export:</strong> Export the current graph as an adjacency matrix</li>
+                    <li><strong>Reset:</strong> Clear all nodes and return to the initial state (Home → School)</li>
+                </ul>
+            </div>
+            <div class="help-section">
+                <h4>
+                    <svg class="section-icon" viewBox="0 0 24 24" fill="currentColor">
+                        <path
+                            d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z" />
+                    </svg>
+                    Tips & Tricks
+                </h4>
+                <ul>
+                    <li>The first 4 nodes (A-D) form the main path from Home to School</li>
+                    <li>After D, new nodes create branches with weighted random connections</li>
+                    <li>Use the grid for better alignment and positioning</li>
+                    <li>Zoom in/out using mouse wheel, pan by dragging the canvas</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Watermark -->
+    <div class="watermark">
+        <span class="watermark-text">Created by <strong>IzukiNo</strong></span>
+        <span class="watermark-separator">•</span>
+        <span class="watermark-year">2025</span>
+    </div>
 
     <!-- Custom Popup Overlays -->
     <div id="popupOverlay" class="popup-overlay">

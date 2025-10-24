@@ -11,7 +11,8 @@ const gData = {
 
 let nextChar = 'A';
 
-const NODE_R = 8;
+const NODE_R = 8; // Size for Home and School nodes
+const REGULAR_NODE_R = 12; // Larger size for regular nodes
 const highlightNodes = new Set();
 const highlightLinks = new Set();
 const selectedNodes = new Set();
@@ -45,11 +46,39 @@ function initToolbar() {
     });
 }
 
+// Help Panel Toggle Functionality
+function initHelpPanel() {
+    const helpPanel = document.getElementById('helpPanel');
+    const helpPanelToggle = document.getElementById('helpPanelToggle');
+    const helpPanelClose = document.getElementById('helpPanelClose');
+    
+    // Toggle panel when clicking the question icon
+    helpPanelToggle.addEventListener('click', () => {
+        helpPanel.classList.toggle('active');
+    });
+    
+    // Close panel when clicking the close button
+    helpPanelClose.addEventListener('click', () => {
+        helpPanel.classList.remove('active');
+    });
+    
+    // Close panel when clicking outside (optional)
+    document.addEventListener('click', (e) => {
+        if (!helpPanel.contains(e.target) && !helpPanelToggle.contains(e.target)) {
+            helpPanel.classList.remove('active');
+        }
+    });
+}
+
 // Initialize toolbar when DOM is ready
 if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initToolbar);
+    document.addEventListener('DOMContentLoaded', () => {
+        initToolbar();
+        initHelpPanel();
+    });
 } else {
     initToolbar();
+    initHelpPanel();
 }
 
 // Load SVG images
@@ -167,11 +196,10 @@ function drawNode(node, ctx, globalScale) {
         ctx.strokeStyle = selectedNodes.has(node) ? '#808080' : '#FF9800';
         ctx.lineWidth = 6/globalScale;
         ctx.stroke();
-    }
-    // Draw ring for selected node (green)
+    }    // Draw ring for selected node (green)
     else if (selectedNodes.has(node)) {
         ctx.beginPath();
-        ctx.arc(node.x, node.y, NODE_R * 1.2, 0, 2 * Math.PI, false);
+        ctx.arc(node.x, node.y, REGULAR_NODE_R * 1.2, 0, 2 * Math.PI, false);
         ctx.strokeStyle = 'green';
         ctx.lineWidth = 5/globalScale;
         ctx.stroke();
@@ -179,7 +207,7 @@ function drawNode(node, ctx, globalScale) {
     // Draw ring for hovered node (gray)
     else if (node === hoverNode) {
         ctx.beginPath();
-        ctx.arc(node.x, node.y, NODE_R * 1.2, 0, 2 * Math.PI, false);
+        ctx.arc(node.x, node.y, REGULAR_NODE_R * 1.2, 0, 2 * Math.PI, false);
         ctx.strokeStyle = 'gray';
         ctx.lineWidth = 5/globalScale;
         ctx.stroke();
@@ -187,7 +215,9 @@ function drawNode(node, ctx, globalScale) {
     
     // Draw main node circle
     ctx.beginPath();
-    ctx.arc(node.x, node.y, NODE_R, 0, 2 * Math.PI, false);
+    // Use different radius for regular nodes vs Home/School
+    const nodeRadius = (node.id === 'home' || node.id === 'school') ? NODE_R : REGULAR_NODE_R;
+    ctx.arc(node.x, node.y, nodeRadius, 0, 2 * Math.PI, false);
     
     // Màu nền khác cho Home và School
     if (node.id === 'home') {
@@ -200,13 +230,12 @@ function drawNode(node, ctx, globalScale) {
     ctx.fill();
     
     ctx.strokeStyle = '#fff';
-    ctx.lineWidth = 1.5/globalScale;
-    ctx.stroke();    // Draw icon/character in center
+    ctx.lineWidth = 1.5/globalScale;    ctx.stroke();    // Draw icon/character in center
     if (node.icon === 'home' || node.icon === 'school') {
         drawIcon(ctx, node.icon, node.x, node.y, NODE_R * 1, '#fff');
     } else {
         const displayText = node.icon || node.id.toUpperCase();
-        const fontSize = 18/globalScale;
+        const fontSize = 20/globalScale; // Larger font for regular nodes
         ctx.font = `bold ${fontSize}px Sans-Serif`;
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
@@ -224,9 +253,9 @@ const Graph = new ForceGraph(document.getElementById('graph'))
     .graphData(gData)
     .nodeLabel('name')
     .nodeRelSize(NODE_R)
-    .d3Force('link', d3.forceLink().distance(80))
-    .d3Force('charge', d3.forceManyBody().strength(-50))
-    .d3Force('collide', d3.forceCollide().radius(20).strength(0.5))
+    .d3Force('link', d3.forceLink().distance(150)) // Tăng khoảng cách link từ 80 lên 150
+    .d3Force('charge', d3.forceManyBody().strength(-200)) // Tăng lực đẩy từ -50 lên -200
+    .d3Force('collide', d3.forceCollide().radius(35).strength(0.8)) // Tăng bán kính va chạm từ 20 lên 35
     .onNodeHover(node => {
         hoverNode = node || null;
         document.getElementById('graph').style.cursor = node ? 'pointer' : 'default';
@@ -355,7 +384,7 @@ const Graph = new ForceGraph(document.getElementById('graph'))
             y: start.y + (end.y - start.y) / 2
         };
           const label = link.weight || '';
-        const fontSize = 22/globalScale;
+        const fontSize = 18/globalScale;
         ctx.font = `bold ${fontSize}px Sans-Serif`;
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
