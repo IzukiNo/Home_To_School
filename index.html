@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home to School - Graph Visualization</title>
+    <meta name="description" content="Interactive graph visualization tool for shortest path algorithms">
+    <link rel="stylesheet" href="css/styles.css">
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/force-graph"></script>
+</head>
+
+<body> <!-- Collapsible Toolbar -->
+    <div id="toolbar" class="toolbar">
+        <div class="toolbar-content">
+            <button id="addNodeBtn" class="toolbar-btn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10" />
+                    <line x1="12" y1="8" x2="12" y2="16" />
+                    <line x1="8" y1="12" x2="16" y2="12" />
+                </svg>
+                <span>Add Node</span>
+            </button>
+            <button id="importBtn" class="toolbar-btn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                    <polyline points="7 10 12 15 17 10" />
+                    <line x1="12" y1="15" x2="12" y2="3" />
+                </svg>
+                <span>Import</span>
+            </button>
+            <button id="exportBtn" class="toolbar-btn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                    <polyline points="17 8 12 3 7 8" />
+                    <line x1="12" y1="3" x2="12" y2="15" />
+                </svg>
+                <span>Export</span>
+            </button>
+            <button id="resetBtn" class="toolbar-btn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" />
+                    <path d="M21 3v5h-5" />
+                    <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16" />
+                    <path d="M3 21v-5h5" />
+                </svg>
+                <span>Reset Graph</span>
+            </button>
+        </div>
+        <button id="toolbarToggle" class="toolbar-toggle" title="Toggle Toolbar">
+            <svg class="toggle-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <path d="M6 9l6 6 6-6" />
+            </svg>
+        </button>
+    </div>
+    <div id="graph"></div>
+
+    <!-- Custom Popup Overlays -->
+    <div id="popupOverlay" class="popup-overlay">
+        <!-- Confirm Dialog -->
+        <div id="confirmDialog" class="popup-dialog">
+            <div class="popup-header">
+                <h3 class="popup-title">Confirm</h3>
+            </div>
+            <div class="popup-body">
+                <p id="confirmMessage"></p>
+            </div>
+            <div class="popup-footer">
+                <button id="confirmCancel" class="popup-btn popup-btn-secondary">Cancel</button>
+                <button id="confirmOk" class="popup-btn popup-btn-primary">OK</button>
+            </div>
+        </div>
+
+        <!-- Prompt Dialog -->
+        <div id="promptDialog" class="popup-dialog">
+            <div class="popup-header">
+                <h3 class="popup-title">Edit Weight</h3>
+            </div>
+            <div class="popup-body">
+                <p id="promptMessage"></p>
+                <input type="number" id="promptInput" class="popup-input" min="1" max="999">
+            </div>
+            <div class="popup-footer">
+                <button id="promptCancel" class="popup-btn popup-btn-secondary">Cancel</button>
+                <button id="promptOk" class="popup-btn popup-btn-primary">OK</button>
+            </div>
+        </div>
+
+        <!-- Import Dialog -->
+        <div id="importDialog" class="popup-dialog">
+            <div class="popup-header">
+                <h3 class="popup-title">Import Adjacency Matrix</h3>
+            </div>
+            <div class="popup-body">
+                <p>Enter adjacency matrix (comma-separated values, one row per line):</p>
+                <p style="font-size: 12px; color: #666; margin-bottom: 8px;">Format: 0, 1, 0, 0<br>Each row represents
+                    connections from a node</p>
+                <textarea id="importTextarea" class="popup-textarea" rows="10"
+                    placeholder="0, 0, 0, 0&#10;0, 0, 0, 0&#10;0, 0, 0, 0&#10;0, 0, 0, 0"></textarea>
+            </div>
+            <div class="popup-footer">
+                <button id="importCancel" class="popup-btn popup-btn-secondary">Cancel</button>
+                <button id="importOk" class="popup-btn popup-btn-primary">Import</button>
+            </div>
+        </div>
+
+        <!-- Export Dialog -->
+        <div id="exportDialog" class="popup-dialog">
+            <div class="popup-header">
+                <h3 class="popup-title">Export Adjacency Matrix</h3>
+            </div>
+            <div class="popup-body">
+                <p>Adjacency Matrix (copy the text below):</p>
+                <p style="font-size: 12px; color: #666; margin-bottom: 8px;">Rows/Columns: <span
+                        id="exportNodeOrder"></span></p>
+                <textarea id="exportTextarea" class="popup-textarea" rows="10" readonly></textarea>
+            </div>
+            <div class="popup-footer">
+                <button id="exportCopy" class="popup-btn popup-btn-primary">Copy to Clipboard</button>
+                <button id="exportClose" class="popup-btn popup-btn-secondary">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/popup.js"></script>
+    <script src="js/algorithm.js"></script>
+    <script src="js/script.js"></script>
+</body>
+
+</html>
