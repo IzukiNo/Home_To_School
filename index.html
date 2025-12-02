@@ -1,229 +1,532 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Home to School - Graph Visualization</title>
-    <meta name="description" content="Interactive graph visualization tool for shortest path algorithms">
+    <meta
+      name="description"
+      content="Interactive graph visualization tool for shortest path algorithms"
+    />
 
     <!-- Favicon -->
-    <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon.png" />
 
     <!-- Open Graph Meta Tags -->
-    <meta property="og:type" content="website">
-    <meta property="og:title" content="Home to School - Graph Visualization">
-    <meta property="og:description" content="Interactive graph visualization tool for shortest path algorithms">
-    <meta property="og:image" content="assets/favicon.png">
-    <meta property="og:url" content="">
-    <meta property="og:site_name" content="Home to School">
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Home to School - Graph Visualization" />
+    <meta
+      property="og:description"
+      content="Interactive graph visualization tool for shortest path algorithms"
+    />
+    <meta property="og:image" content="assets/favicon.png" />
+    <meta property="og:url" content="" />
+    <meta property="og:site_name" content="Home to School" />
 
     <!-- Twitter Card Meta Tags -->
-    <meta name="twitter:card" content="summary">
-    <meta name="twitter:title" content="Home to School - Graph Visualization">
-    <meta name="twitter:description" content="Interactive graph visualization tool for shortest path algorithms">
-    <meta name="twitter:image" content="assets/favicon.png">
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Home to School - Graph Visualization" />
+    <meta
+      name="twitter:description"
+      content="Interactive graph visualization tool for shortest path algorithms"
+    />
+    <meta name="twitter:image" content="assets/favicon.png" />
 
-    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/styles.css" />
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <script src="//cdn.jsdelivr.net/npm/force-graph"></script>
-</head>
+  </head>
 
-<body> <!-- Collapsible Toolbar -->
+  <body>
+    <!-- Collapsible Toolbar -->
     <div id="toolbar" class="toolbar">
-        <div class="toolbar-content">
-            <button id="addNodeBtn" class="toolbar-btn">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="12" cy="12" r="10" />
-                    <line x1="12" y1="8" x2="12" y2="16" />
-                    <line x1="8" y1="12" x2="16" y2="12" />
-                </svg>
-                <span>Add Node</span>
-            </button>
-            <button id="importBtn" class="toolbar-btn">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                    <polyline points="7 10 12 15 17 10" />
-                    <line x1="12" y1="15" x2="12" y2="3" />
-                </svg>
-                <span>Import</span>
-            </button>
-            <button id="exportBtn" class="toolbar-btn">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                    <polyline points="17 8 12 3 7 8" />
-                    <line x1="12" y1="3" x2="12" y2="15" />
-                </svg>
-                <span>Export</span>
-            </button>
-            <button id="resetBtn" class="toolbar-btn">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" />
-                    <path d="M21 3v5h-5" />
-                    <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16" />
-                    <path d="M3 21v-5h5" />
-                </svg>
-                <span>Reset Graph</span>
-            </button>
-        </div>
-        <button id="toolbarToggle" class="toolbar-toggle" title="Toggle Toolbar">
-            <svg class="toggle-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                <path d="M6 9l6 6 6-6" />
-            </svg>
+      <div class="toolbar-content">
+        <button id="addNodeBtn" class="toolbar-btn">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <circle cx="12" cy="12" r="10" />
+            <line x1="12" y1="8" x2="12" y2="16" />
+            <line x1="8" y1="12" x2="16" y2="12" />
+          </svg>
+          <span>Add Node</span>
         </button>
-    </div>
-    <div id="graph"></div> <!-- Help Panel Button (Bottom Right) -->
-    <button id="helpPanelToggle" class="help-panel-toggle" title="Help">
-        <svg viewBox="0 0 24 24" fill="currentColor">
-            <path
-                d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z" />
+        <button id="importBtn" class="toolbar-btn">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+            <polyline points="7 10 12 15 17 10" />
+            <line x1="12" y1="15" x2="12" y2="3" />
+          </svg>
+          <span>Import</span>
+        </button>
+        <button id="exportBtn" class="toolbar-btn">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+            <polyline points="17 8 12 3 7 8" />
+            <line x1="12" y1="3" x2="12" y2="15" />
+          </svg>
+          <span>Export</span>
+        </button>
+        <button id="resetBtn" class="toolbar-btn">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" />
+            <path d="M21 3v5h-5" />
+            <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16" />
+            <path d="M3 21v-5h5" />
+          </svg>
+          <span>Reset Graph</span>
+        </button>
+      </div>
+      <button id="toolbarToggle" class="toolbar-toggle" title="Toggle Toolbar">
+        <svg
+          class="toggle-icon"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2.5"
+        >
+          <path d="M6 9l6 6 6-6" />
         </svg>
+      </button>
+    </div>
+
+    <!-- Graph Direction Toggle (Next to Toolbar) -->
+    <button
+      id="graphDirectionToggle"
+      class="graph-direction-toggle"
+      title="Toggle Graph Direction"
+    >
+      <div class="toggle-slider">
+        <svg
+          class="toggle-icon-directed"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <path d="M5 12h14M14 5l7 7-7 7" />
+        </svg>
+        <svg
+          class="toggle-icon-undirected"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <line x1="5" y1="12" x2="19" y2="12" />
+          <circle cx="5" cy="12" r="2" />
+          <circle cx="19" cy="12" r="2" />
+        </svg>
+      </div>
+      <span class="toggle-label">rected</span>
+    </button>
+
+    <!-- Algorithm Controls -->
+    <div id="algorithmControls" class="algorithm-controls">
+      <select id="algorithmSelector" class="algorithm-selector">
+        <option value="dijkstra">Dijkstra</option>
+        <!--<option value="bellman-ford">Bellman-Ford</option>-->
+      </select>
+      <button id="startAlgorithmBtn" class="algorithm-btn">
+        <svg class="btn-icon" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M8 5v14l11-7z" />
+        </svg>
+        <span class="btn-text">Start</span>
+      </button>
+    </div>
+
+    <div id="graph"></div>
+
+    <!-- Step Controller -->
+    <div id="stepController" class="step-controller hidden">
+      <div class="step-controls">
+        <button id="firstStepBtn" class="step-btn" title="First Step">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path d="M18 6L6 12l12 6V6z" />
+            <path d="M6 6v12" />
+          </svg>
+        </button>
+        <button id="prevStepBtn" class="step-btn" title="Previous Step">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path d="M15 18l-6-6 6-6" />
+          </svg>
+        </button>
+        <button id="playPauseBtn" class="step-btn play-btn" title="Play/Pause">
+          <svg class="play-icon" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M8 5v14l11-7z" />
+          </svg>
+          <svg
+            class="pause-icon hidden"
+            viewBox="0 0 24 24"
+            fill="currentColor"
+          >
+            <path d="M6 4h4v16H6zM14 4h4v16h-4z" />
+          </svg>
+        </button>
+        <button id="nextStepBtn" class="step-btn" title="Next Step">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path d="M9 18l6-6-6-6" />
+          </svg>
+        </button>
+        <button id="lastStepBtn" class="step-btn" title="Last Step">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path d="M6 6l12 6-12 6V6z" />
+            <path d="M18 6v12" />
+          </svg>
+        </button>
+        <div class="step-info">
+          <span id="stepCounter">Step 0 / 0</span>
+        </div>
+        <div class="speed-control">
+          <label for="speedSlider">Speed:</label>
+          <input
+            type="range"
+            id="speedSlider"
+            min="0.5"
+            max="10"
+            step="0.5"
+            value="1"
+          />
+          <span id="speedValue">1.0x</span>
+        </div>
+      </div>
+      <div class="step-description">
+        <span id="stepDescription">Ready to start visualization</span>
+      </div>
+    </div>
+
+    <!-- Path Visualizer -->
+    <div id="pathVisualizer" class="path-visualizer hidden">
+      <label for="pathSelector">Show path to:</label>
+      <select id="pathSelector" class="path-selector">
+        <option value="">None</option>
+      </select>
+    </div>
+
+    <!-- Result Panel -->
+    <div id="resultPanel" class="result-panel hidden">
+      <div class="result-header">
+        <h3>Algorithm Results</h3>
+        <button id="closeResultBtn" class="close-result-btn">×</button>
+      </div>
+      <div class="result-content">
+        <table id="resultTable" class="result-table">
+          <thead>
+            <tr>
+              <th>Node</th>
+              <th>Distance</th>
+              <th>Path</th>
+              <th>Reachable</th>
+            </tr>
+          </thead>
+          <tbody id="resultTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Step Table Window (Draggable/Resizable) -->
+    <div id="stepTableWindow" class="step-table-window hidden">
+      <div class="step-table-header">
+        <div class="step-table-title-bar">
+          <h3 class="step-table-title">Bảng Dijkstra</h3>
+          <div class="step-table-controls">
+            <button
+              id="stepTableCollapse"
+              class="step-table-control-btn"
+              title="Collapse"
+            >
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path d="M18 15l-6-6-6 6" />
+              </svg>
+            </button>
+            <button
+              id="stepTableClose"
+              class="step-table-control-btn"
+              title="Close"
+            >
+              ×
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="step-table-body">
+        <div class="step-table-scroll">
+          <table id="stepTable" class="step-table">
+            <thead id="stepTableHead">
+              <tr>
+                <th class="step-index-col">Step</th>
+                <!-- Node columns will be added dynamically -->
+              </tr>
+            </thead>
+            <tbody id="stepTableBody">
+              <!-- Rows will be added dynamically -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="step-table-resize-handle"></div>
+    </div>
+
+    <!-- Help Panel Button (Bottom Right) -->
+    <button id="helpPanelToggle" class="help-panel-toggle" title="Help">
+      <svg viewBox="0 0 24 24" fill="currentColor">
+        <path
+          d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z"
+        />
+      </svg>
     </button>
 
     <!-- Help Panel (Slides up from bottom right) -->
     <div id="helpPanel" class="help-panel">
-        <div class="help-panel-header">
-            <h3>How to Use</h3>
-            <button id="helpPanelClose" class="help-panel-close" title="Close">×</button>
+      <div class="help-panel-header">
+        <h3>How to Use</h3>
+        <button id="helpPanelClose" class="help-panel-close" title="Close">
+          ×
+        </button>
+      </div>
+      <div class="help-panel-content">
+        <div class="help-section">
+          <h4>
+            <svg class="section-icon" viewBox="0 0 24 24" fill="currentColor">
+              <path
+                d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"
+              />
+            </svg>
+            Node Operations
+          </h4>
+          <ul>
+            <li>
+              <strong>Add Node:</strong> Click the "Add Node" button to create a
+              new location (A-Z)
+            </li>
+            <li>
+              <strong>Create Link:</strong> Click on two nodes to connect them
+            </li>
+            <li>
+              <strong>Remove Link:</strong> Click the same two nodes again to
+              remove the connection
+            </li>
+            <li>
+              <strong>Drag Node:</strong> Click and drag any node to reposition
+              it
+            </li>
+          </ul>
         </div>
-        <div class="help-panel-content">
-            <div class="help-section">
-                <h4>
-                    <svg class="section-icon" viewBox="0 0 24 24" fill="currentColor">
-                        <path
-                            d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z" />
-                    </svg>
-                    Node Operations
-                </h4>
-                <ul>
-                    <li><strong>Add Node:</strong> Click the "Add Node" button to create a new location (A-Z)</li>
-                    <li><strong>Create Link:</strong> Click on two nodes to connect them</li>
-                    <li><strong>Remove Link:</strong> Click the same two nodes again to remove the connection</li>
-                    <li><strong>Drag Node:</strong> Click and drag any node to reposition it</li>
-                </ul>
-            </div>
-            <div class="help-section">
-                <h4>
-                    <svg class="section-icon" viewBox="0 0 24 24" fill="currentColor">
-                        <path
-                            d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z" />
-                    </svg>
-                    Link Operations
-                </h4>
-                <ul>
-                    <li><strong>Edit Weight:</strong> Double-click on any link to change its weight</li>
-                    <li><strong>Hover:</strong> Hover over links to highlight them</li>
-                </ul>
-            </div>
-            <div class="help-section">
-                <h4>
-                    <svg class="section-icon" viewBox="0 0 24 24" fill="currentColor">
-                        <path
-                            d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z" />
-                    </svg>
-                    Graph Management
-                </h4>
-                <ul>
-                    <li><strong>Import:</strong> Import an adjacency matrix (comma-separated values)</li>
-                    <li><strong>Export:</strong> Export the current graph as an adjacency matrix</li>
-                    <li><strong>Reset:</strong> Clear all nodes and return to the initial state (Home → School)</li>
-                </ul>
-            </div>
-            <div class="help-section">
-                <h4>
-                    <svg class="section-icon" viewBox="0 0 24 24" fill="currentColor">
-                        <path
-                            d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z" />
-                    </svg>
-                    Tips & Tricks
-                </h4>
-                <ul>
-                    <li>The first 4 nodes (A-D) form the main path from Home to School</li>
-                    <li>After D, new nodes create branches with weighted random connections</li>
-                    <li>Use the grid for better alignment and positioning</li>
-                    <li>Zoom in/out using mouse wheel, pan by dragging the canvas</li>
-                </ul>
-            </div>
+        <div class="help-section">
+          <h4>
+            <svg class="section-icon" viewBox="0 0 24 24" fill="currentColor">
+              <path
+                d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"
+              />
+            </svg>
+            Link Operations
+          </h4>
+          <ul>
+            <li>
+              <strong>Edit Weight:</strong> Double-click on any link to change
+              its weight
+            </li>
+            <li><strong>Hover:</strong> Hover over links to highlight them</li>
+          </ul>
         </div>
+        <div class="help-section">
+          <h4>
+            <svg class="section-icon" viewBox="0 0 24 24" fill="currentColor">
+              <path
+                d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"
+              />
+            </svg>
+            Graph Management
+          </h4>
+          <ul>
+            <li>
+              <strong>Import:</strong> Import an adjacency matrix
+              (comma-separated values)
+            </li>
+            <li>
+              <strong>Export:</strong> Export the current graph as an adjacency
+              matrix
+            </li>
+            <li>
+              <strong>Reset:</strong> Clear all nodes and return to the initial
+              state (Home → School)
+            </li>
+          </ul>
+        </div>
+        <div class="help-section">
+          <h4>
+            <svg class="section-icon" viewBox="0 0 24 24" fill="currentColor">
+              <path
+                d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"
+              />
+            </svg>
+            Tips & Tricks
+          </h4>
+          <ul>
+            <li>
+              The first 4 nodes (A-D) form the main path from Home to School
+            </li>
+            <li>
+              After D, new nodes create branches with weighted random
+              connections
+            </li>
+            <li>Use the grid for better alignment and positioning</li>
+            <li>Zoom in/out using mouse wheel, pan by dragging the canvas</li>
+          </ul>
+        </div>
+      </div>
     </div>
 
     <!-- Watermark -->
     <div class="watermark">
-        <span class="watermark-text">Created by <strong>IzukiNo</strong></span>
-        <span class="watermark-separator">•</span>
-        <span class="watermark-year">2025</span>
+      <span class="watermark-text">Created by <strong>IzukiNo</strong></span>
+      <span class="watermark-separator">•</span>
+      <span class="watermark-year">2025</span>
     </div>
 
     <!-- Custom Popup Overlays -->
     <div id="popupOverlay" class="popup-overlay">
-        <!-- Confirm Dialog -->
-        <div id="confirmDialog" class="popup-dialog">
-            <div class="popup-header">
-                <h3 class="popup-title">Confirm</h3>
-            </div>
-            <div class="popup-body">
-                <p id="confirmMessage"></p>
-            </div>
-            <div class="popup-footer">
-                <button id="confirmCancel" class="popup-btn popup-btn-secondary">Cancel</button>
-                <button id="confirmOk" class="popup-btn popup-btn-primary">OK</button>
-            </div>
+      <!-- Confirm Dialog -->
+      <div id="confirmDialog" class="popup-dialog">
+        <div class="popup-header">
+          <h3 class="popup-title">Confirm</h3>
         </div>
+        <div class="popup-body">
+          <p id="confirmMessage"></p>
+        </div>
+        <div class="popup-footer">
+          <button id="confirmCancel" class="popup-btn popup-btn-secondary">
+            Cancel
+          </button>
+          <button id="confirmOk" class="popup-btn popup-btn-primary">OK</button>
+        </div>
+      </div>
 
-        <!-- Prompt Dialog -->
-        <div id="promptDialog" class="popup-dialog">
-            <div class="popup-header">
-                <h3 class="popup-title">Edit Weight</h3>
-            </div>
-            <div class="popup-body">
-                <p id="promptMessage"></p>
-                <input type="number" id="promptInput" class="popup-input" min="1" max="999">
-            </div>
-            <div class="popup-footer">
-                <button id="promptCancel" class="popup-btn popup-btn-secondary">Cancel</button>
-                <button id="promptOk" class="popup-btn popup-btn-primary">OK</button>
-            </div>
+      <!-- Prompt Dialog -->
+      <div id="promptDialog" class="popup-dialog">
+        <div class="popup-header">
+          <h3 class="popup-title">Edit Weight</h3>
         </div>
+        <div class="popup-body">
+          <p id="promptMessage"></p>
+          <input
+            type="number"
+            id="promptInput"
+            class="popup-input"
+            min="1"
+            max="999"
+          />
+        </div>
+        <div class="popup-footer">
+          <button id="promptCancel" class="popup-btn popup-btn-secondary">
+            Cancel
+          </button>
+          <button id="promptOk" class="popup-btn popup-btn-primary">OK</button>
+        </div>
+      </div>
 
-        <!-- Import Dialog -->
-        <div id="importDialog" class="popup-dialog">
-            <div class="popup-header">
-                <h3 class="popup-title">Import Adjacency Matrix</h3>
-            </div>
-            <div class="popup-body">
-                <p>Enter adjacency matrix (comma-separated values, one row per line):</p>
-                <p style="font-size: 12px; color: #666; margin-bottom: 8px;">Format: 0, 1, 0, 0<br>Each row represents
-                    connections from a node</p>
-                <textarea id="importTextarea" class="popup-textarea" rows="10"
-                    placeholder="0, 0, 0, 0&#10;0, 0, 0, 0&#10;0, 0, 0, 0&#10;0, 0, 0, 0"></textarea>
-            </div>
-            <div class="popup-footer">
-                <button id="importCancel" class="popup-btn popup-btn-secondary">Cancel</button>
-                <button id="importOk" class="popup-btn popup-btn-primary">Import</button>
-            </div>
+      <!-- Import Dialog -->
+      <div id="importDialog" class="popup-dialog">
+        <div class="popup-header">
+          <h3 class="popup-title">Import Adjacency Matrix</h3>
         </div>
+        <div class="popup-body">
+          <p>
+            Enter adjacency matrix (comma-separated values, one row per line):
+          </p>
+          <p style="font-size: 12px; color: #666; margin-bottom: 8px">
+            Format: 0, 1, 0, 0<br />Each row represents connections from a node
+          </p>
+          <textarea
+            id="importTextarea"
+            class="popup-textarea"
+            rows="10"
+            placeholder="0, 0, 0, 0&#10;0, 0, 0, 0&#10;0, 0, 0, 0&#10;0, 0, 0, 0"
+          ></textarea>
+        </div>
+        <div class="popup-footer">
+          <button id="importCancel" class="popup-btn popup-btn-secondary">
+            Cancel
+          </button>
+          <button id="importOk" class="popup-btn popup-btn-primary">
+            Import
+          </button>
+        </div>
+      </div>
 
-        <!-- Export Dialog -->
-        <div id="exportDialog" class="popup-dialog">
-            <div class="popup-header">
-                <h3 class="popup-title">Export Adjacency Matrix</h3>
-            </div>
-            <div class="popup-body">
-                <p>Adjacency Matrix (copy the text below):</p>
-                <p style="font-size: 12px; color: #666; margin-bottom: 8px;">Rows/Columns: <span
-                        id="exportNodeOrder"></span></p>
-                <textarea id="exportTextarea" class="popup-textarea" rows="10" readonly></textarea>
-            </div>
-            <div class="popup-footer">
-                <button id="exportCopy" class="popup-btn popup-btn-primary">Copy to Clipboard</button>
-                <button id="exportClose" class="popup-btn popup-btn-secondary">Close</button>
-            </div>
+      <!-- Export Dialog -->
+      <div id="exportDialog" class="popup-dialog">
+        <div class="popup-header">
+          <h3 class="popup-title">Export Adjacency Matrix</h3>
         </div>
+        <div class="popup-body">
+          <p>Adjacency Matrix (copy the text below):</p>
+          <p style="font-size: 12px; color: #666; margin-bottom: 8px">
+            Rows/Columns: <span id="exportNodeOrder"></span>
+          </p>
+          <textarea
+            id="exportTextarea"
+            class="popup-textarea"
+            rows="10"
+            readonly
+          ></textarea>
+        </div>
+        <div class="popup-footer">
+          <button id="exportCopy" class="popup-btn popup-btn-primary">
+            Copy to Clipboard
+          </button>
+          <button id="exportClose" class="popup-btn popup-btn-secondary">
+            Close
+          </button>
+        </div>
+      </div>
     </div>
-
     <script src="js/popup.js"></script>
     <script src="js/algorithm.js"></script>
     <script src="js/script.js"></script>
-</body>
-
+    <script src="js/visualizer.js"></script>
+  </body>
 </html>
