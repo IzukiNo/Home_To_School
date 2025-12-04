@@ -1500,32 +1500,40 @@ function updateUIForAlgoState() {
   const toolbar = document.getElementById("toolbar");
   const stepTable = document.getElementById("stepTableWindow");
   const resultPanel = document.getElementById("resultPanel");
+  const helpPanel = document.getElementById("helpPanel");
 
-  if (isMobileMode && isAlgoRunning) {
-    // Hide Help Panel button, show Panels button
+  if (isAlgoRunning) {
+    // Algorithm is running (both mobile and desktop)
+    // Hide Help Panel button and panel, show Panels button
     helpToggle.classList.add("hidden");
     panelsToggle.classList.remove("hidden");
 
-    // Hide toolbar on mobile during algorithm
-    toolbar.style.display = "none";
+    // Close help panel if it's open
+    if (helpPanel && helpPanel.classList.contains("active")) {
+      helpPanel.classList.remove("active");
+    }
 
-    // Hide Step Table and Result Panel initially on mobile
-    // They will only show when user clicks Panels dropdown items
-    stepTable.classList.add("hidden");
-    resultPanel.classList.add("hidden");
-  } else if (isMobileMode && !isAlgoRunning) {
+    if (isMobileMode) {
+      // Mobile specific: hide toolbar
+      toolbar.style.display = "none";
+
+      // Hide Step Table and Result Panel initially on mobile
+      // They will only show when user clicks Panels dropdown items
+      stepTable.classList.add("hidden");
+      resultPanel.classList.add("hidden");
+    } else {
+      // Desktop: keep toolbar visible
+      toolbar.style.display = "flex";
+
+      // On desktop, panels can be shown by default (controlled by visualizer)
+    }
+  } else {
+    // Algorithm is not running (both mobile and desktop)
     // Show Help Panel button, hide Panels button
     helpToggle.classList.remove("hidden");
     panelsToggle.classList.add("hidden");
 
-    // Show toolbar on mobile when algorithm stops
-    toolbar.style.display = "flex";
-  } else {
-    // Desktop: always show help, never show panels button
-    helpToggle.classList.remove("hidden");
-    panelsToggle.classList.add("hidden");
-
-    // Desktop: always show toolbar
+    // Always show toolbar when algorithm is not running
     toolbar.style.display = "flex";
   }
 }

@@ -43,6 +43,7 @@ class AlgorithmVisualizer {
     startBtn.addEventListener("click", () => {
       if (!this.isRunning) {
         this.startAlgorithm();
+        this.pausePlay();
       } else {
         this.stopAlgorithm();
       }
@@ -231,21 +232,16 @@ class AlgorithmVisualizer {
     const algorithmSelector = document.getElementById("algorithmSelector");
     algorithmSelector.disabled = true;
     algorithmSelector.style.opacity = "0.6";
-    algorithmSelector.style.cursor = "not-allowed";
-
-    // Hide help panel if open and remember state
+    algorithmSelector.style.cursor = "not-allowed"; // Hide help panel if open and remember state
     const helpPanel = document.getElementById("helpPanel");
     if (helpPanel && helpPanel.classList.contains("active")) {
       helpPanel.classList.remove("active");
       this.helpPanelWasOpen = true;
     } else {
       this.helpPanelWasOpen = false;
-    } // Disable help panel toggle
-    const helpToggle = document.getElementById("helpPanelToggle");
-    if (helpToggle) {
-      helpToggle.style.pointerEvents = "none";
-      helpToggle.style.opacity = "0.5";
     }
+
+    // Note: Help panel toggle visibility is now handled by updateUIForAlgoState()
 
     // Disable graph interactions (prevent node/link editing)
     Graph.onNodeClick(null);
@@ -274,21 +270,16 @@ class AlgorithmVisualizer {
     const algorithmSelector = document.getElementById("algorithmSelector");
     algorithmSelector.disabled = false;
     algorithmSelector.style.opacity = "1";
-    algorithmSelector.style.cursor = "pointer";
-
-    // Restore help panel if it was open
+    algorithmSelector.style.cursor = "pointer"; // Restore help panel if it was open
     if (this.helpPanelWasOpen) {
       const helpPanel = document.getElementById("helpPanel");
       if (helpPanel) {
         helpPanel.classList.add("active");
       }
       this.helpPanelWasOpen = false;
-    } // Enable help panel toggle
-    const helpToggle = document.getElementById("helpPanelToggle");
-    if (helpToggle) {
-      helpToggle.style.pointerEvents = "auto";
-      helpToggle.style.opacity = "1";
     }
+
+    // Note: Help panel toggle visibility is now handled by updateUIForAlgoState()
 
     // Restore graph container styling
     const graphContainer = document.getElementById("graph");

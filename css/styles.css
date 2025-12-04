@@ -1082,6 +1082,10 @@ body {
   transform: rotate(180deg);
 }
 
+.help-panel-toggle.hidden {
+  display: none;
+}
+
 /* Panels Toggle Button (Bottom Right - Mobile Algo Running) */
 .panels-toggle {
   position: fixed;
@@ -1595,7 +1599,6 @@ body {
   position: fixed;
   bottom: 20px;
   left: 50%;
-  transform: translateX(-50%);
   z-index: 100;
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(10px);
@@ -1681,7 +1684,8 @@ body {
   transition: opacity 0.2s ease;
 }
 
-.hidden {
+.play-icon.hidden,
+.pause-icon.hidden {
   display: none;
 }
 
