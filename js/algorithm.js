@@ -20,27 +20,53 @@ function dijkstraDetailed(gData, startId, isDirected = true) {
     });
   }
 
-  // Helper function to get neighbors
+  // =========================
+  // FIXED getNeighbors()
+  // =========================
   function getNeighbors(nodeIndex) {
     const neighbors = [];
+
     gData.links.forEach((link) => {
       const sourceIdx =
         typeof link.source === "object"
           ? link.source.index
           : gData.nodes.findIndex((n) => n.id === link.source);
+
       const targetIdx =
         typeof link.target === "object"
           ? link.target.index
           : gData.nodes.findIndex((n) => n.id === link.target);
+
       const weight = link.weight ?? 1;
 
+      // Forward edge
       if (sourceIdx === nodeIndex) {
         neighbors.push({ to: targetIdx, weight });
-      } else if (!isDirected && targetIdx === nodeIndex) {
-        // In undirected mode, also consider reverse edges
-        neighbors.push({ to: sourceIdx, weight });
+      }
+
+      // UNDIRECTED FIX:
+      // Only add reverse edge IF the dataset does NOT already contain one.
+      if (!isDirected && targetIdx === nodeIndex) {
+        const reverseExists = gData.links.some((l) => {
+          const s =
+            typeof l.source === "object"
+              ? l.source.index
+              : gData.nodes.findIndex((n) => n.id === l.source);
+          const t =
+            typeof l.target === "object"
+              ? l.target.index
+              : gData.nodes.findIndex((n) => n.id === l.target);
+
+          // Reverse exists if there's a link A→B matching B→A
+          return s === nodeIndex && t === sourceIdx;
+        });
+
+        if (!reverseExists) {
+          neighbors.push({ to: sourceIdx, weight });
+        }
       }
     });
+
     return neighbors;
   }
 
@@ -55,7 +81,7 @@ function dijkstraDetailed(gData, startId, isDirected = true) {
     description: `Initialize: selected node ${gData.nodes[startIndex].name} (index ${startIndex})`,
   });
 
-  // Relax directly from start
+  // Relax neighbors of start
   const startNeighbors = getNeighbors(startIndex);
   startNeighbors.forEach(({ to, weight }) => {
     distances[to] = weight;
@@ -77,10 +103,10 @@ function dijkstraDetailed(gData, startId, isDirected = true) {
   // MAIN LOOP
   // =========================
   for (let iter = 1; iter < n; iter++) {
-    // Chọn node chưa thăm có distance nhỏ nhất
     let minNode = -1;
     let minDist = Infinity;
 
+    // Find unvisited node with smallest dist
     for (let i = 0; i < n; i++) {
       if (!visited[i] && distances[i] < minDist) {
         minDist = distances[i];
@@ -95,9 +121,10 @@ function dijkstraDetailed(gData, startId, isDirected = true) {
       chosen: minNode,
       description: `Chọn node ${gData.nodes[minNode].name} (index ${minNode}) với distance ${minDist}`,
     });
+
     visited[minNode] = true;
 
-    // Relax all edges from minNode
+    // Relax edges
     const neighbors = getNeighbors(minNode);
     neighbors.forEach(({ to, weight }) => {
       if (!visited[to]) {
@@ -128,13 +155,16 @@ function dijkstraDetailed(gData, startId, isDirected = true) {
       }
     });
   }
+
+  // =========================
+  // BUILD RESULT
+  // =========================
   const result = {};
 
   for (let i = 0; i < n; i++) {
     const node = gData.nodes[i];
     const dist = distances[i];
 
-    // reconstruct path
     let pathIndexes = [];
     if (dist !== Infinity) {
       let cur = i;
@@ -145,35 +175,25 @@ function dijkstraDetailed(gData, startId, isDirected = true) {
       pathIndexes.reverse();
     }
 
-    const pathIds = pathIndexes.map((idx) => gData.nodes[idx].id);
-    const pathNames = pathIndexes.map((idx) => gData.nodes[idx].name);
-
     result[node.id] = {
       id: node.id,
       name: node.name,
-
       distance: dist,
       totalWeight: dist,
-
       reachable: dist !== Infinity,
-
-      pathIds,
-      pathNames,
-      pathString: pathNames.join(" → "),
+      pathIds: pathIndexes.map((idx) => gData.nodes[idx].id),
+      pathNames: pathIndexes.map((idx) => gData.nodes[idx].name),
+      pathString: pathIndexes.map((idx) => gData.nodes[idx].name).join(" → "),
     };
   }
 
-  // Add final "end" step to clear all visual effects
   pushStep({
     type: "end",
     description: "Algorithm complete - all shortest paths found",
     chosen: null,
   });
 
-  return {
-    steps,
-    result,
-  };
+  return { steps, result };
 }
 
 // Bellman-Ford Algorithm with detailed steps

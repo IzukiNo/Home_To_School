@@ -29,6 +29,8 @@ class AlgorithmVisualizer {
     this.currentIterationRow = null; // Current row being updated
     this.iterationCount = 0; // Number of iterations (select steps)
     this.currentRowData = {}; // Current state of distances and previous for current row
+    this.lastStepType = null; // Track the last step type for conditional row creation
+    this.pendingSelected = null; // Track node that was selected but not yet marked visited in new row
 
     this.initializeControls();
     this.initializeStepTable();
@@ -37,7 +39,6 @@ class AlgorithmVisualizer {
   initializeControls() {
     // Algorithm selector and start button
     const startBtn = document.getElementById("startAlgorithmBtn");
-    const algorithmSelector = document.getElementById("algorithmSelector");
 
     startBtn.addEventListener("click", () => {
       if (!this.isRunning) {
@@ -94,16 +95,13 @@ class AlgorithmVisualizer {
       document.getElementById("resultPanel").classList.add("hidden");
     });
   }
-
   async startAlgorithm() {
     const algorithmSelector = document.getElementById("algorithmSelector");
     const algorithm = algorithmSelector.value;
     this.algorithmName = algorithm;
 
     // Get start node (always 'home')
-    const startId = "home";
-
-    // Disable graph editing
+    const startId = "home"; // Disable graph editing
     this.disableGraphEditing();
 
     // Show step controller
@@ -118,14 +116,21 @@ class AlgorithmVisualizer {
 
     this.isRunning = true;
 
+    // Update UI for algorithm running state
+    if (typeof isAlgoRunning !== "undefined") {
+      isAlgoRunning = true;
+      updateUIForAlgoState();
+    }
+
     try {
       // Run the algorithm
       let algorithmResult;
       if (algorithm === "dijkstra") {
         algorithmResult = dijkstraDetailed(gData, startId, isDirectedGraph);
-      } else if (algorithm === "bellman-ford") {
-        algorithmResult = bellmanFordDetailed(gData, startId, isDirectedGraph);
       }
+      // else if (algorithm === "bellman-ford") {
+      //   algorithmResult = bellmanFordDetailed(gData, startId, isDirectedGraph);
+      // }
 
       this.steps = algorithmResult.steps;
       this.result = algorithmResult.result;
@@ -134,18 +139,22 @@ class AlgorithmVisualizer {
       // Update step counter
       document.getElementById(
         "stepCounter"
-      ).textContent = `Step 0 / ${this.steps.length}`;
-
-      // Populate path selector
+      ).textContent = `Step 0 / ${this.steps.length}`; // Populate path selector
       this.populatePathSelector(); // Show path visualizer
       document.getElementById("pathVisualizer").classList.remove("hidden");
 
-      // Show result panel
+      // Show result panel (not on mobile initially)
       this.displayResults();
+      if (typeof isMobileMode !== "undefined" && isMobileMode) {
+        document.getElementById("resultPanel").classList.add("hidden");
+      }
 
-      // Build and show step table
+      // Build and show step table (not on mobile initially)
       this.buildStepTableStructure();
       this.showStepTable();
+      if (typeof isMobileMode !== "undefined" && isMobileMode) {
+        document.getElementById("stepTableWindow").classList.add("hidden");
+      }
 
       // Go to first step
       this.nextStep();
@@ -164,9 +173,7 @@ class AlgorithmVisualizer {
     if (this.playInterval) {
       clearInterval(this.playInterval);
       this.playInterval = null;
-    }
-
-    // Enable graph editing
+    } // Enable graph editing
     this.enableGraphEditing(); // Hide controllers and result panel
     document.getElementById("stepController").classList.add("hidden");
     document.getElementById("pathVisualizer").classList.add("hidden");
@@ -181,6 +188,12 @@ class AlgorithmVisualizer {
     startBtn.classList.remove("running");
     startBtn.querySelector(".btn-text").textContent = "Start";
     startBtn.querySelector(".btn-icon").innerHTML = '<path d="M8 5v14l11-7z"/>';
+
+    // Update UI for algorithm stopped state
+    if (typeof isAlgoRunning !== "undefined") {
+      isAlgoRunning = false;
+      updateUIForAlgoState();
+    }
 
     // Reset visual state
     this.resetAllVisuals();
@@ -237,8 +250,6 @@ class AlgorithmVisualizer {
     // Disable graph interactions (prevent node/link editing)
     Graph.onNodeClick(null);
     Graph.onLinkClick(null);
-    Graph.onNodeDrag(null);
-    Graph.onNodeDragEnd(null);
 
     // Visual indicator - locked cursor
     const graphContainer = document.getElementById("graph");
@@ -309,7 +320,6 @@ class AlgorithmVisualizer {
       this.updateStepUI();
     }
   }
-
   nextStep() {
     if (this.currentStep < this.steps.length - 1) {
       this.currentStep++;
@@ -328,7 +338,6 @@ class AlgorithmVisualizer {
       this.updateStepUI();
     }
   }
-
   togglePlay() {
     if (this.isPlaying) {
       this.pausePlay();
@@ -357,7 +366,6 @@ class AlgorithmVisualizer {
 
     this.startPlayInterval();
   }
-
   startPlayInterval() {
     const delay = 1000 / this.speed;
     this.playInterval = setInterval(() => {
@@ -455,7 +463,6 @@ class AlgorithmVisualizer {
     // Refresh graph rendering
     this.refreshGraphVisuals();
   }
-
   highlightNode(nodeIndex, color) {
     if (nodeIndex >= 0 && nodeIndex < gData.nodes.length) {
       gData.nodes[nodeIndex]._highlightColor = color;
@@ -463,7 +470,6 @@ class AlgorithmVisualizer {
       this.highlightedNodes.add(nodeIndex);
     }
   }
-
   highlightEdge(fromIndex, toIndex, color) {
     const link = gData.links.find((l) => {
       const sourceIdx =
@@ -483,7 +489,6 @@ class AlgorithmVisualizer {
       this.highlightedEdges.add(link);
     }
   }
-
   updateNodeDistances(distances) {
     distances.forEach((dist, idx) => {
       if (idx < gData.nodes.length) {
@@ -515,7 +520,6 @@ class AlgorithmVisualizer {
     this.visitedNodes.clear();
     this.currentChosenNode = null;
   }
-
   clearAllVisualizationEffects() {
     // Clear all algorithm step visualization effects
     gData.nodes.forEach((node) => {
@@ -540,7 +544,6 @@ class AlgorithmVisualizer {
     this.pathHighlight.clear();
     this.pathNodes.clear();
   }
-
   refreshGraphVisuals() {
     // Clear all visual ring colors first
     gData.nodes.forEach((node) => {
@@ -598,7 +601,6 @@ class AlgorithmVisualizer {
     // Trigger graph refresh to apply changes
     Graph.graphData(gData);
   }
-
   updateStepUI() {
     const step = this.steps[this.currentStep];
 
@@ -619,7 +621,6 @@ class AlgorithmVisualizer {
     document.getElementById("lastStepBtn").disabled =
       this.currentStep === this.steps.length - 1;
   }
-
   populatePathSelector() {
     const pathSelector = document.getElementById("pathSelector");
     pathSelector.innerHTML = '<option value="">None</option>';
@@ -668,13 +669,11 @@ class AlgorithmVisualizer {
 
     this.refreshGraphVisuals();
   }
-
   clearPathHighlight() {
     this.pathHighlight.clear();
     this.pathNodes.clear();
     this.refreshGraphVisuals();
   }
-
   displayResults() {
     const resultPanel = document.getElementById("resultPanel");
     const tableBody = document.getElementById("resultTableBody");
@@ -842,15 +841,12 @@ class AlgorithmVisualizer {
       this.stepTableWindow.classList.add("hidden");
     });
   }
-
   showStepTable() {
     this.stepTableWindow.classList.remove("hidden");
   }
-
   hideStepTable() {
     this.stepTableWindow.classList.add("hidden");
   }
-
   buildStepTableStructure() {
     // Create node order (Home, A, B, C, ..., School)
     this.nodeOrder = [];
@@ -893,13 +889,14 @@ class AlgorithmVisualizer {
       th.setAttribute("data-node-id", node.id);
       headerRow.appendChild(th);
     });
-
     tableHead.appendChild(headerRow); // Clear table body and state
     document.getElementById("stepTableBody").innerHTML = "";
     this.stepTableData = [];
     this.currentIterationRow = null;
     this.iterationCount = 0;
     this.currentRowData = {};
+    this.lastStepType = null;
+    this.pendingSelected = null;
   }
   createNewIterationRow(step) {
     console.log("createNewIterationRow called with step type:", step.type);
@@ -949,10 +946,10 @@ class AlgorithmVisualizer {
           const prev = previous[nodeIndex];
 
           if (dist === Infinity) {
-            cell.textContent = "(∞,-)";
+            cell.textContent = "(∞, -)";
             cell.className = "infinity-value";
             this.currentRowData[nodeIndex] = {
-              value: "(∞,-)",
+              value: "(∞, -)",
               dist: Infinity,
               prev: null,
               visited: false,
@@ -1004,7 +1001,6 @@ class AlgorithmVisualizer {
       scrollContainer.scrollTop = scrollContainer.scrollHeight;
     }
   }
-
   updateCurrentIterationCell(step) {
     if (!this.currentIterationRow) return;
 
@@ -1032,10 +1028,10 @@ class AlgorithmVisualizer {
       const prev = previous[nodeIndex];
 
       if (dist === Infinity) {
-        cell.textContent = "(∞,-)";
+        cell.textContent = "(∞, -)";
         cell.className = "infinity-value";
         this.currentRowData[nodeIndex] = {
-          value: "(∞,-)",
+          value: "(∞, -)",
           dist: Infinity,
           prev: null,
           visited: false,
@@ -1067,7 +1063,6 @@ class AlgorithmVisualizer {
       };
     }
   }
-
   highlightCheckedCell(step) {
     if (!this.currentIterationRow) return;
 
@@ -1091,10 +1086,111 @@ class AlgorithmVisualizer {
       // Keep chosen-node class
     });
   }
+  // Helper function to update select in current row (without creating new row)
+  updateSelectInCurrentRow(step) {
+    if (!this.currentIterationRow) return;
+
+    console.log(
+      "updateSelectInCurrentRow - updating chosen node in current row"
+    );
+
+    // Get current state
+    const distances = step.distances || [];
+    const previous = step.previous || [];
+    const visited = step.visited || [];
+
+    // Remove previous chosen-node highlights
+    const cells = this.currentIterationRow.querySelectorAll("td");
+    cells.forEach((cell) => {
+      cell.classList.remove("chosen-node");
+    });
+
+    // Update the chosen node cell with its distance and highlight
+    const chosenNodeIndex = step.chosen;
+    if (chosenNodeIndex !== undefined && chosenNodeIndex >= 0) {
+      const chosenCell = this.currentIterationRow.querySelector(
+        `[data-node-index="${chosenNodeIndex}"]`
+      );
+
+      if (chosenCell) {
+        const dist = distances[chosenNodeIndex];
+        const prev = previous[chosenNodeIndex];
+
+        if (dist !== Infinity && dist !== undefined) {
+          const prevNode =
+            prev !== null && prev !== undefined ? gData.nodes[prev] : null;
+          const prevLabel = prevNode ? prevNode.id : "-";
+          chosenCell.textContent = `(${dist}, ${prevLabel})`;
+          chosenCell.className = "chosen-node"; // Highlight as chosen
+
+          this.currentRowData[chosenNodeIndex] = {
+            value: `(${dist}, ${prevLabel})`,
+            dist,
+            prev,
+            visited: false,
+          };
+        }
+      }
+    }
+
+    // Update stored data
+    if (this.stepTableData.length > 0) {
+      this.stepTableData[this.stepTableData.length - 1].data = {
+        ...this.currentRowData,
+      };
+    }
+
+    // Mark this node as pending to be visited in the next row
+    this.pendingSelected = step.chosen;
+    console.log("Set pendingSelected to:", this.pendingSelected);
+  }
+
+  // Helper to create a "post-select" row where the selected node becomes visited
+  createPostSelectRow(step) {
+    console.log(
+      "createPostSelectRow - Creating row where selected node becomes visited"
+    );
+
+    // Build a step-like object with the selected node marked as visited
+    const postSelectStep = {
+      ...step,
+      distances: [],
+      previous: [],
+      visited: [],
+    };
+
+    // Reconstruct distances and previous from currentRowData
+    this.nodeOrder.forEach((node) => {
+      const nodeIndex = gData.nodes.findIndex((n) => n.id === node.id);
+      if (nodeIndex >= 0 && this.currentRowData[nodeIndex]) {
+        const data = this.currentRowData[nodeIndex];
+        postSelectStep.distances[nodeIndex] =
+          data.dist !== undefined ? data.dist : Infinity;
+        postSelectStep.previous[nodeIndex] =
+          data.prev !== undefined ? data.prev : null;
+        postSelectStep.visited[nodeIndex] = data.visited || false;
+      }
+    });
+
+    // Mark the pending selected node as visited
+    if (this.pendingSelected !== null) {
+      postSelectStep.visited[this.pendingSelected] = true;
+      postSelectStep.chosen = this.pendingSelected;
+    }
+
+    // Create the new row
+    this.createNewIterationRow(postSelectStep);
+
+    // Clear pending selected
+    console.log("Clearing pendingSelected after creating post-select row");
+    this.pendingSelected = null;
+  }
   updateStepTable(step, stepIndex) {
     console.log(">>> updateStepTable called <<<");
     console.log("Step index:", stepIndex);
     console.log("Step type:", step.type);
+    console.log("Last step type:", this.lastStepType);
+    console.log("Pending selected:", this.pendingSelected);
     console.log("Full step object:", step);
 
     // Clear previous highlights
@@ -1103,20 +1199,54 @@ class AlgorithmVisualizer {
     console.log("About to enter switch statement with step.type =", step.type);
     switch (step.type) {
       case "init":
-        // First step - create initial row
-        console.log("✓ MATCHED INIT CASE - Creating init row");
-        this.createNewIterationRow(step);
-        break;
+        console.log("✓ MATCHED INIT CASE - Creating 2 init rows");
 
-      case "select":
-        // New iteration - create new row
-        console.log("✓ MATCHED SELECT CASE - Creating select row");
+        // ROW #1: Initialization state
         this.createNewIterationRow(step);
+
+        // ROW #2: Start node becomes visited (mark as "-")
+        // Create a modified step with visited start node
+        const initStep2 = {
+          ...step,
+          visited: [...step.visited],
+        };
+        initStep2.visited[step.chosen] = true; // Mark start as visited
+
+        console.log("Creating second init row (start node visited)");
+        this.createNewIterationRow(initStep2);
+
+        break;
+      case "select":
+        console.log("✓ MATCHED SELECT CASE");
+
+        // HANDLE SELECT → SELECT case (dead-end / no edges case)
+        // If there's a pending selected node from a previous SELECT
+        // (and last step wasn't a check that already handled it),
+        // create a new row where the pending node becomes visited first
+        if (this.pendingSelected !== null && this.lastStepType !== "check") {
+          console.log(
+            "→ SELECT after SELECT detected! Creating post-select row for previous selection first"
+          );
+          this.createPostSelectRow(step);
+        }
+
+        // Now update the selected node in the current row and mark as pending
+        console.log("→ Updating current row with new selection");
+        this.updateSelectInCurrentRow(step);
         break;
 
       case "check":
         console.log("✓ MATCHED CHECK CASE");
-        // Just highlight the cell being checked
+
+        // If there's a pending selected node, create a new row where it becomes visited
+        if (this.pendingSelected !== null) {
+          console.log(
+            "→ Found pendingSelected, creating post-select row first"
+          );
+          this.createPostSelectRow(step);
+        }
+
+        // Now highlight the cell being checked in the current row
         this.highlightCheckedCell(step);
         break;
 
@@ -1140,12 +1270,14 @@ class AlgorithmVisualizer {
         console.log("⚠️ NO CASE MATCHED! step.type =", step.type);
     }
 
+    // Track last step type for next iteration
+    this.lastStepType = step.type;
+
     console.log("Calling updateIterationHighlight");
     // Update row highlight
     this.updateIterationHighlight();
     console.log(">>> updateStepTable completed <<<");
   }
-
   updateIterationHighlight() {
     const tableBody = document.getElementById("stepTableBody");
     const rows = tableBody.querySelectorAll("tr");
@@ -1162,7 +1294,6 @@ class AlgorithmVisualizer {
       }
     });
   }
-
   updateStepTableHighlight(stepIndex) {
     const tableBody = document.getElementById("stepTableBody");
     const rows = tableBody.querySelectorAll("tr");
@@ -1186,34 +1317,66 @@ class AlgorithmVisualizer {
     this.currentIterationRow = null;
     this.iterationCount = 0;
     this.currentRowData = {};
+    this.lastStepType = null;
+    this.pendingSelected = null; // Reset pending selected during rebuild
 
     // Replay all steps up to current step
     for (let i = 0; i <= this.currentStep && i < this.steps.length; i++) {
       const step = this.steps[i];
+      const nextStep = i < this.steps.length - 1 ? this.steps[i + 1] : null;
 
       switch (step.type) {
         case "init":
+          // Create 2 rows for init
           this.createNewIterationRow(step);
+
+          // Second row: start node visited
+          const initStep2 = {
+            ...step,
+            visited: [...step.visited],
+          };
+          initStep2.visited[step.chosen] = true;
+          this.createNewIterationRow(initStep2);
           break;
+
         case "select":
-          this.createNewIterationRow(step);
+          // Update current row and set pendingSelected
+          this.updateSelectInCurrentRow(step);
+
+          // If next step is NOT a check, or we're at the last step, create the post-select row now
+          if (!nextStep || nextStep.type !== "check") {
+            this.createPostSelectRow(step);
+          }
+          // Otherwise, the post-select row will be created when we process the check step
           break;
+
+        case "check":
+          // If there's a pending selected, create the post-select row
+          if (this.pendingSelected !== null) {
+            this.createPostSelectRow(step);
+          }
+          // Note: we don't need to highlight during rebuild
+          break;
+
         case "update":
           this.updateCurrentIterationCell(step);
           break;
-        // check, iteration, end don't create/update rows during rebuild
+        // iteration, end don't create/update rows during rebuild
       }
+
+      this.lastStepType = step.type;
     }
 
     this.updateIterationHighlight();
   }
-
   clearStepTable() {
     document.getElementById("stepTableBody").innerHTML = "";
     this.stepTableData = [];
     this.currentIterationRow = null;
     this.iterationCount = 0;
     this.currentRowData = {};
+    this.lastStepType = null;
+    this.pendingSelected = null;
   }
 }
 

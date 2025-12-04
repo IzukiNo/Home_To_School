@@ -38,7 +38,7 @@
   </head>
 
   <body>
-    <!-- Collapsible Toolbar -->
+    <!-- Collapsible Toolbar (2x2 Grid) -->
     <div id="toolbar" class="toolbar">
       <div class="toolbar-content">
         <button id="addNodeBtn" class="toolbar-btn">
@@ -106,6 +106,75 @@
           <path d="M6 9l6 6 6-6" />
         </svg>
       </button>
+    </div>
+    <!-- Hamburger Menu Button (Top Right - Independent) -->
+    <button id="hamburgerBtn" class="hamburger-menu-btn">
+      <div class="hamburger-icon">
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+      </div>
+    </button>
+
+    <!-- Hamburger Dropdown Panel -->
+    <div id="hamburgerDropdown" class="hamburger-dropdown">
+      <div class="hamburger-dropdown-content">
+        <!-- Graph Direction Toggle -->
+        <div class="dropdown-item">
+          <label class="dropdown-label">Graph Type</label>
+          <button
+            id="mobileGraphDirectionToggle"
+            class="mobile-graph-direction-toggle"
+            title="Toggle Graph Direction"
+          >
+            <div class="mobile-toggle-slider">
+              <svg
+                class="mobile-toggle-icon-directed"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path d="M5 12h14M14 5l7 7-7 7" />
+              </svg>
+              <svg
+                class="mobile-toggle-icon-undirected"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <line x1="5" y1="12" x2="19" y2="12" />
+                <circle cx="5" cy="12" r="2" />
+                <circle cx="19" cy="12" r="2" />
+              </svg>
+            </div>
+            <span class="mobile-toggle-label">rected</span>
+          </button>
+        </div>
+
+        <!-- Algorithm Selector -->
+        <div class="dropdown-item">
+          <label class="dropdown-label">Algorithm</label>
+          <select
+            id="mobileAlgorithmSelector"
+            class="mobile-algorithm-selector"
+          >
+            <option value="dijkstra">Dijkstra</option>
+            <!--<option value="bellman-ford">Bellman-Ford</option>-->
+          </select>
+        </div>
+
+        <!-- Start Button -->
+        <div class="dropdown-item">
+          <button id="mobileStartAlgorithmBtn" class="mobile-algorithm-btn">
+            <svg class="btn-icon" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M8 5v14l11-7z" />
+            </svg>
+            <span class="btn-text">Start Algorithm</span>
+          </button>
+        </div>
+      </div>
     </div>
 
     <!-- Graph Direction Toggle (Next to Toolbar) -->
@@ -319,6 +388,49 @@
       </svg>
     </button>
 
+    <!-- Panels Button (Bottom Right - Mobile Algo Running) -->
+    <button id="panelsToggle" class="panels-toggle hidden" title="Panels">
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+      >
+        <rect x="3" y="3" width="7" height="7" />
+        <rect x="14" y="3" width="7" height="7" />
+        <rect x="3" y="14" width="7" height="7" />
+        <rect x="14" y="14" width="7" height="7" />
+      </svg>
+    </button>
+
+    <!-- Panels Dropdown (Mobile Algo Running) -->
+    <div id="panelsDropdown" class="panels-dropdown">
+      <button id="panelsStepTableBtn" class="panels-dropdown-item">
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <path d="M3 3h18v18H3z" />
+          <path d="M3 9h18M3 15h18M9 3v18" />
+        </svg>
+        <span>Step Table</span>
+      </button>
+      <button id="panelsResultBtn" class="panels-dropdown-item">
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <path d="M9 11l3 3L22 4" />
+          <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" />
+        </svg>
+        <span>Algorithm Result</span>
+      </button>
+    </div>
+
     <!-- Help Panel (Slides up from bottom right) -->
     <div id="helpPanel" class="help-panel">
       <div class="help-panel-header">
@@ -335,23 +447,33 @@
                 d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"
               />
             </svg>
-            Node Operations
+            Graph Editing
           </h4>
           <ul>
             <li>
-              <strong>Add Node:</strong> Click the "Add Node" button to create a
-              new location (A-Z)
+              <strong>Add Node:</strong> Click "Add Node" to create nodes A-Z.
+              First 4 nodes (A-D) form a linear path from Home to School. After
+              D, nodes connect with 2-3 random edges.
             </li>
             <li>
-              <strong>Create Link:</strong> Click on two nodes to connect them
+              <strong>Create Link:</strong> Click first node (green highlight
+              appears) → Click second node to create directed edge.
             </li>
             <li>
-              <strong>Remove Link:</strong> Click the same two nodes again to
-              remove the connection
+              <strong>Remove Link:</strong> Click same two nodes again to delete
+              existing edge.
             </li>
             <li>
-              <strong>Drag Node:</strong> Click and drag any node to reposition
-              it
+              <strong>Edit Weight:</strong> Double-click on any edge, enter new
+              weight (1-999) in popup.
+            </li>
+            <li>
+              <strong>Move Node:</strong> Click and drag any node to reposition.
+              Physics simulation auto-adjusts connected nodes.
+            </li>
+            <li>
+              <strong>Graph Mode:</strong> Toggle directed/undirected mode
+              (top-left button). Undirected creates bidirectional edges.
             </li>
           </ul>
         </div>
@@ -359,17 +481,38 @@
           <h4>
             <svg class="section-icon" viewBox="0 0 24 24" fill="currentColor">
               <path
-                d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"
+                d="M9.4 16.6L4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0l4.6-4.6-4.6-4.6L16 6l6 6-6 6-1.4-1.4z"
               />
             </svg>
-            Link Operations
+            Algorithm Visualization
           </h4>
           <ul>
             <li>
-              <strong>Edit Weight:</strong> Double-click on any link to change
-              its weight
+              <strong>Start Algorithm:</strong> Select algorithm (Dijkstra) →
+              Click "Start". Graph editing disabled during visualization.
             </li>
-            <li><strong>Hover:</strong> Hover over links to highlight them</li>
+            <li>
+              <strong>Playback Controls:</strong> Use ⏮️ (first), ◀️ (previous),
+              ▶️ (play/pause), ▶️ (next), ⏭️ (last) buttons to control
+              step-by-step execution.
+            </li>
+            <li>
+              <strong>Speed Control:</strong> Adjust slider (0.25x-4.0x) to
+              change auto-play speed.
+            </li>
+            <li>
+              <strong>Step Table:</strong> Draggable/resizable window shows
+              algorithm state per iteration. Each row represents one iteration.
+              Columns show (distance, previous) for each node.
+            </li>
+            <li>
+              <strong>Path Selector:</strong> Choose any destination from
+              dropdown to highlight shortest path from Home in purple.
+            </li>
+            <li>
+              <strong>Stop:</strong> Click "Stop" button to end visualization
+              and re-enable graph editing.
+            </li>
           </ul>
         </div>
         <div class="help-section">
@@ -379,20 +522,103 @@
                 d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"
               />
             </svg>
-            Graph Management
+            Understanding Step Table
           </h4>
           <ul>
             <li>
-              <strong>Import:</strong> Import an adjacency matrix
-              (comma-separated values)
+              <strong>Yellow Cell (★):</strong> Chosen node - currently being
+              processed by algorithm.
             </li>
             <li>
-              <strong>Export:</strong> Export the current graph as an adjacency
-              matrix
+              <strong>Green Cell:</strong> Updated node - distance was improved
+              (edge relaxed) in this step.
             </li>
             <li>
-              <strong>Reset:</strong> Clear all nodes and return to the initial
-              state (Home → School)
+              <strong>Yellow Border:</strong> Checked node - edge is being
+              evaluated but not improved.
+            </li>
+            <li>
+              <strong>Gray Cell (-):</strong> Visited node - already processed,
+              no longer in frontier.
+            </li>
+            <li><strong>Blue Row:</strong> Current step being displayed.</li>
+            <li>
+              <strong>Faded Rows:</strong> Previous steps already executed.
+            </li>
+            <li>
+              <strong>Cell Format:</strong> (distance, previous_node) - e.g.,
+              (15, A) means distance 15 via node A.
+            </li>
+            <li>
+              <strong>(∞, -):</strong> Infinity - node not yet reachable from
+              source.
+            </li>
+          </ul>
+        </div>
+        <div class="help-section">
+          <h4>
+            <svg class="section-icon" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z" />
+            </svg>
+            Visual Indicators
+          </h4>
+          <ul>
+            <li>
+              <strong>Green Ring:</strong> Selected node for creating link, or
+              algorithm initialization.
+            </li>
+            <li>
+              <strong>Blue Ring:</strong> Current node being processed (SELECT
+              step).
+            </li>
+            <li>
+              <strong>Yellow Edge:</strong> Edge being checked (CHECK step).
+            </li>
+            <li>
+              <strong>Green Edge:</strong> Edge successfully relaxed (UPDATE
+              step).
+            </li>
+            <li>
+              <strong>Purple Path:</strong> Highlighted shortest path from Path
+              Selector.
+            </li>
+            <li>
+              <strong>Gray Nodes:</strong> Visited/processed nodes during
+              algorithm.
+            </li>
+            <li>
+              <strong>Dimmed Graph:</strong> When path selected, non-path
+              elements dimmed.
+            </li>
+          </ul>
+        </div>
+        <div class="help-section">
+          <h4>
+            <svg class="section-icon" viewBox="0 0 24 24" fill="currentColor">
+              <path
+                d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"
+              />
+            </svg>
+            Import/Export
+          </h4>
+          <ul>
+            <li>
+              <strong>Export:</strong> Generates adjacency matrix. Node order:
+              Home, A-Z alphabetically, School. Click "Copy to Clipboard" to
+              copy.
+            </li>
+            <li>
+              <strong>Import:</strong> Paste comma-separated adjacency matrix.
+              Must be square (NxN). Auto-detects directed (asymmetric) vs
+              undirected (symmetric) from matrix structure.
+            </li>
+            <li>
+              <strong>Format:</strong> Rows = source nodes, Columns = target
+              nodes, Values = edge weights (0 = no edge).
+            </li>
+            <li>
+              <strong>Reset:</strong> Clears all custom nodes, returns to
+              initial Home → School graph.
             </li>
           </ul>
         </div>
@@ -403,18 +629,34 @@
                 d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"
               />
             </svg>
-            Tips & Tricks
+            Tips & Shortcuts
           </h4>
           <ul>
             <li>
-              The first 4 nodes (A-D) form the main path from Home to School
+              <strong>Navigation:</strong> Mouse wheel to zoom, click-drag
+              canvas to pan, click-drag nodes to move.
             </li>
             <li>
-              After D, new nodes create branches with weighted random
-              connections
+              <strong>Toolbar:</strong> Click toggle button (⊕/⊖) at top-center
+              to collapse/expand toolbar.
             </li>
-            <li>Use the grid for better alignment and positioning</li>
-            <li>Zoom in/out using mouse wheel, pan by dragging the canvas</li>
+            <li>
+              <strong>Mobile:</strong> App auto-zooms on small screens. Touch
+              gestures: pinch to zoom, drag to pan.
+            </li>
+            <li>
+              <strong>During Visualization:</strong> Graph editing disabled.
+              Path selector and playback controls enabled.
+            </li>
+            <li>
+              <strong>Step Table:</strong> Drag header to move window. Drag
+              bottom-right corner to resize. Click collapse (−) to minimize.
+            </li>
+            <li>
+              <strong>Performance:</strong> Keep graph under 50 nodes for smooth
+              physics. Open console (F12) and use Graph.pauseAnimation() to
+              freeze simulation if needed.
+            </li>
           </ul>
         </div>
       </div>

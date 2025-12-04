@@ -48,6 +48,152 @@ function initToolbar() {
   });
 }
 
+// Hamburger Menu Functionality (Top Right Independent)
+function initHamburgerMenu() {
+  const hamburgerBtn = document.getElementById("hamburgerBtn");
+  const dropdown = document.getElementById("hamburgerDropdown");
+
+  // Check if elements exist (for mobile view)
+  if (!hamburgerBtn || !dropdown) return;
+
+  const mobileGraphToggle = document.getElementById(
+    "mobileGraphDirectionToggle"
+  );
+  const mobileAlgorithmSelector = document.getElementById(
+    "mobileAlgorithmSelector"
+  );
+  const mobileStartBtn = document.getElementById("mobileStartAlgorithmBtn");
+
+  // Desktop elements
+  const desktopGraphToggle = document.getElementById("graphDirectionToggle");
+  const desktopAlgorithmSelector = document.getElementById("algorithmSelector");
+  const desktopStartBtn = document.getElementById("startAlgorithmBtn");
+
+  let isDropdownOpen = false;
+  // Toggle dropdown
+  hamburgerBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    isDropdownOpen = !isDropdownOpen;
+    if (isDropdownOpen) {
+      dropdown.classList.add("show");
+      hamburgerBtn.classList.add("open");
+      syncMobileControls();
+    } else {
+      dropdown.classList.remove("show");
+      hamburgerBtn.classList.remove("open");
+    }
+  });
+  // Close dropdown when clicking outside
+  document.addEventListener("click", (e) => {
+    if (
+      isDropdownOpen &&
+      !dropdown.contains(e.target) &&
+      !hamburgerBtn.contains(e.target)
+    ) {
+      isDropdownOpen = false;
+      dropdown.classList.remove("show");
+      hamburgerBtn.classList.remove("open");
+    }
+  });
+
+  // Prevent dropdown clicks from closing it
+  dropdown.addEventListener("click", (e) => {
+    e.stopPropagation();
+  });
+
+  // Sync mobile controls with desktop controls
+  function syncMobileControls() {
+    if (!desktopGraphToggle || !desktopAlgorithmSelector || !desktopStartBtn)
+      return;
+
+    // Sync graph direction state
+    if (desktopGraphToggle.classList.contains("undirected")) {
+      mobileGraphToggle.classList.add("undirected");
+    } else {
+      mobileGraphToggle.classList.remove("undirected");
+    }
+
+    // Sync algorithm selector
+    mobileAlgorithmSelector.value = desktopAlgorithmSelector.value;
+
+    // Sync button state
+    if (desktopStartBtn.classList.contains("running")) {
+      mobileStartBtn.classList.add("running");
+      mobileStartBtn.querySelector(".btn-text").textContent = "Stop";
+    } else {
+      mobileStartBtn.classList.remove("running");
+      mobileStartBtn.querySelector(".btn-text").textContent = "Start Algorithm";
+    }
+
+    if (desktopStartBtn.classList.contains("disabled")) {
+      mobileStartBtn.classList.add("disabled");
+    } else {
+      mobileStartBtn.classList.remove("disabled");
+    }
+  }
+
+  // Mobile graph direction toggle
+  if (mobileGraphToggle) {
+    mobileGraphToggle.addEventListener("click", () => {
+      if (desktopGraphToggle) {
+        desktopGraphToggle.click();
+        // Sync state
+        if (desktopGraphToggle.classList.contains("undirected")) {
+          mobileGraphToggle.classList.add("undirected");
+        } else {
+          mobileGraphToggle.classList.remove("undirected");
+        }
+      }
+    });
+  }
+
+  // Mobile algorithm selector
+  if (mobileAlgorithmSelector) {
+    mobileAlgorithmSelector.addEventListener("change", () => {
+      if (desktopAlgorithmSelector) {
+        desktopAlgorithmSelector.value = mobileAlgorithmSelector.value;
+      }
+    });
+  }
+
+  // Mobile start button
+  if (mobileStartBtn) {
+    mobileStartBtn.addEventListener("click", () => {
+      if (desktopStartBtn) {
+        desktopStartBtn.click();
+        // Close dropdown after starting
+        isDropdownOpen = false;
+        dropdown.classList.remove("show");
+      }
+    });
+  }
+
+  // Listen for changes in desktop controls to update mobile
+  if (desktopGraphToggle && desktopStartBtn && desktopAlgorithmSelector) {
+    const observer = new MutationObserver(() => {
+      if (isDropdownOpen) {
+        syncMobileControls();
+      }
+    });
+
+    observer.observe(desktopGraphToggle, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
+
+    observer.observe(desktopStartBtn, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
+
+    desktopAlgorithmSelector.addEventListener("change", () => {
+      if (isDropdownOpen) {
+        syncMobileControls();
+      }
+    });
+  }
+}
+
 // Help Panel Toggle Functionality
 function initHelpPanel() {
   const helpPanel = document.getElementById("helpPanel");
@@ -192,11 +338,13 @@ if (document.readyState === "loading") {
     initToolbar();
     initHelpPanel();
     initGraphDirectionToggle();
+    initHamburgerMenu();
   });
 } else {
   initToolbar();
   initHelpPanel();
   initGraphDirectionToggle();
+  initHamburgerMenu();
 }
 
 // Load SVG images
@@ -311,9 +459,11 @@ function drawNode(node, ctx, globalScale) {
   if (node._visualRingColor) {
     // Use visualizer's ring color for algorithm visualization
     const nodeRadius =
-      node.id === "home" || node.id === "school" ? NODE_R : REGULAR_NODE_R;
+      node.id === "home" || node.id === "school"
+        ? NODE_R * 1.2
+        : REGULAR_NODE_R;
     ctx.beginPath();
-    ctx.arc(node.x, node.y, nodeRadius * 1.5, 0, 2 * Math.PI, false);
+    ctx.arc(node.x, node.y, nodeRadius * 1.3, 0, 2 * Math.PI, false);
     ctx.strokeStyle = node._visualRingColor;
     ctx.lineWidth = 6 / globalScale;
     ctx.stroke();
@@ -376,7 +526,7 @@ function drawNode(node, ctx, globalScale) {
     drawIcon(ctx, node.icon, node.x, node.y, NODE_R * 1, "#fff");
   } else {
     const displayText = node.icon || node.id.toUpperCase();
-    const fontSize = 20 / globalScale; // Larger font for regular nodes
+    const fontSize = 18 / globalScale; // Larger font for regular nodes
     ctx.font = `bold ${fontSize}px Sans-Serif`;
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
@@ -547,7 +697,7 @@ const Graph = new ForceGraph(document.getElementById("graph"))
     link === hoverLink ? "rgba(108, 110, 255, 0.6)" : "rgba(100, 100, 100, 0.6)"
   )
   .linkWidth((link) => (link === hoverLink ? 8 : 5))
-  .linkCanvasObjectMode(() => "before")
+  .linkCanvasObjectMode(() => "after")
   .linkCanvasObject((link, ctx, globalScale) => {
     const start = link.source;
     const end = link.target;
@@ -564,12 +714,21 @@ const Graph = new ForceGraph(document.getElementById("graph"))
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
 
-    // Draw text with white stroke for better visibility on grid
-    ctx.strokeStyle = "rgba(255, 255, 255, 0.8)";
+    // Draw multi-layer outline for maximum visibility over any edge color
+    // Outer white stroke (thicker)
+    ctx.strokeStyle = "rgb(255, 255, 255)";
     ctx.lineWidth = 3 / globalScale;
+    ctx.lineJoin = "round";
+    ctx.miterLimit = 2;
     ctx.strokeText(label, textPos.x, textPos.y);
 
-    ctx.fillStyle = "#333";
+    // Inner darker stroke for definition
+    ctx.strokeStyle = "rgba(0, 0, 0, 0)";
+    ctx.lineWidth = 2.5 / globalScale;
+    ctx.strokeText(label, textPos.x, textPos.y);
+
+    // Fill text
+    ctx.fillStyle = "#1f2937";
     ctx.fillText(label, textPos.x, textPos.y);
   });
 
@@ -856,8 +1015,8 @@ document.getElementById("addNodeBtn").addEventListener("click", async () => {
     return;
   }
 
-  const nodeId = nextChar.toLowerCase();
-  const nodeName = `Location ${nextChar}`;
+  const nodeId = nextChar.toUpperCase();
+  const nodeName = `${nextChar}`;
   const nodeIcon = nextChar;
 
   // Get all nodes except School
@@ -1323,3 +1482,120 @@ function importFromAdjacencyMatrix(matrix) {
 
   console.log(`Graph imported with ${n} nodes and ${gData.links.length} links`);
 }
+
+// ============================================================
+// Mobile Detection & Panels Toggle for Algorithm Running
+// ============================================================
+
+let isMobileMode = false;
+let isAlgoRunning = false;
+
+function detectMobile() {
+  isMobileMode = window.innerWidth <= 768;
+}
+
+function updateUIForAlgoState() {
+  const helpToggle = document.getElementById("helpPanelToggle");
+  const panelsToggle = document.getElementById("panelsToggle");
+  const toolbar = document.getElementById("toolbar");
+  const stepTable = document.getElementById("stepTableWindow");
+  const resultPanel = document.getElementById("resultPanel");
+
+  if (isMobileMode && isAlgoRunning) {
+    // Hide Help Panel button, show Panels button
+    helpToggle.classList.add("hidden");
+    panelsToggle.classList.remove("hidden");
+
+    // Hide toolbar on mobile during algorithm
+    toolbar.style.display = "none";
+
+    // Hide Step Table and Result Panel initially on mobile
+    // They will only show when user clicks Panels dropdown items
+    stepTable.classList.add("hidden");
+    resultPanel.classList.add("hidden");
+  } else if (isMobileMode && !isAlgoRunning) {
+    // Show Help Panel button, hide Panels button
+    helpToggle.classList.remove("hidden");
+    panelsToggle.classList.add("hidden");
+
+    // Show toolbar on mobile when algorithm stops
+    toolbar.style.display = "flex";
+  } else {
+    // Desktop: always show help, never show panels button
+    helpToggle.classList.remove("hidden");
+    panelsToggle.classList.add("hidden");
+
+    // Desktop: always show toolbar
+    toolbar.style.display = "flex";
+  }
+}
+
+function initPanelsToggle() {
+  const panelsToggle = document.getElementById("panelsToggle");
+  const panelsDropdown = document.getElementById("panelsDropdown");
+  const stepTableBtn = document.getElementById("panelsStepTableBtn");
+  const resultBtn = document.getElementById("panelsResultBtn");
+
+  let isDropdownOpen = false;
+
+  // Toggle dropdown
+  panelsToggle.addEventListener("click", (e) => {
+    e.stopPropagation();
+    isDropdownOpen = !isDropdownOpen;
+    if (isDropdownOpen) {
+      panelsDropdown.classList.add("show");
+    } else {
+      panelsDropdown.classList.remove("show");
+    }
+  });
+  // Close dropdown when clicking outside
+  document.addEventListener("click", (e) => {
+    if (
+      isDropdownOpen &&
+      !panelsDropdown.contains(e.target) &&
+      !panelsToggle.contains(e.target)
+    ) {
+      isDropdownOpen = false;
+      panelsDropdown.classList.remove("show");
+    }
+  });
+
+  // Step Table button
+  stepTableBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    const stepTable = document.getElementById("stepTableWindow");
+    if (stepTable.classList.contains("hidden")) {
+      stepTable.classList.remove("hidden");
+    } else {
+      stepTable.classList.add("hidden");
+    }
+    // Close dropdown
+    isDropdownOpen = false;
+    panelsDropdown.classList.remove("show");
+  });
+
+  // Result button
+  resultBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    const resultPanel = document.getElementById("resultPanel");
+    if (resultPanel.classList.contains("hidden")) {
+      resultPanel.classList.remove("hidden");
+    } else {
+      resultPanel.classList.add("hidden");
+    }
+    // Close dropdown
+    isDropdownOpen = false;
+    panelsDropdown.classList.remove("show");
+  });
+}
+
+// Detect mobile on load and resize
+window.addEventListener("resize", () => {
+  detectMobile();
+  updateUIForAlgoState();
+});
+
+detectMobile();
+
+// Initialize on load
+initPanelsToggle();
