@@ -218,7 +218,7 @@ start index.html
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/home-to-school.git
+git clone https://github.com/IzukiNo/Home_To_School.git
 cd home-to-school
 
 # Open in browser
@@ -1705,7 +1705,7 @@ We welcome contributions from the community! Whether you're fixing bugs, adding 
 ```powershell
 # Click the "Fork" button on GitHub
 # Then clone your fork
-git clone https://github.com/YOUR_USERNAME/home-to-school.git
+git clone https://github.com/IzukiNo/Home_To_School.git
 cd home-to-school
 ```
 
@@ -1820,7 +1820,7 @@ Before submitting PR, ensure:
 
 **Before reporting:**
 
-1. Check [existing issues](https://github.com/IzukiNo/home-to-school/issues)
+1. Check [existing issues](https://github.com/IzukiNo/Home_To_School/issues)
 2. Try latest version
 3. Reproduce in different browser
 
@@ -2082,19 +2082,17 @@ This project wouldn't exist without these amazing libraries:
 
 **Documentation:**
 
-- 📖 Read this README thoroughly
-- 📘 Check [docs/GUIDE.md](docs/GUIDE.md) for extended guide
-- 🇻🇳 Vietnamese docs: [docs/GRAPH_LOGIC_VI.md](docs/GRAPH_LOGIC_VI.md)
+- App Logic (Vietnamese): [docs/APP_LOGIC.md](docs/APP_LOGIC.md)
 
 **Issues & Bugs:**
 
-- 🐛 Report bugs: [GitHub Issues](https://github.com/IzukiNo/home-to-school/issues)
+- 🐛 Report bugs: [GitHub Issues](https://github.com/IzukiNo/Home_To_School/issues)
 - 🔍 Search existing issues first
 - 📋 Use issue templates for better responses
 
 **Questions & Discussions:**
 
-- 💬 Ask questions: [GitHub Discussions](https://github.com/IzukiNo/home-to-school/discussions)
+- 💬 Ask questions: [GitHub Discussions](https://github.com/IzukiNo/Home_To_School/discussions)
 - 💡 Share ideas and feature requests
 - 🤝 Connect with other users
 
