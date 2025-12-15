@@ -1,5 +1,5 @@
 // Algorithm Visualization Engine
-// Handles step-by-step playback of Dijkstra and Bellman-Ford algorithms
+// Handles step-by-step playback of Dijkstra algorithms
 
 class AlgorithmVisualizer {
   constructor() {
