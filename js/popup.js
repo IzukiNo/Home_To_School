@@ -1,6 +1,3 @@
-/**
- * PopupManager - Quản lý stack các popup có thể đè lên nhau
- */
 class PopupManager {
   constructor() {
     this.popupStack = []; // Stack để quản lý các popup đang mở

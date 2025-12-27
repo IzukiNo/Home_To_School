@@ -1,6 +1,34 @@
+/**
+ * @typedef {Object} GraphNode
+ * @property {string} id - ID duy nhất của node (dùng để liên kết)
+ * @property {string} name - Tên hiển thị của node
+ * @property {string} icon - Tên icon đại diện cho node (ví dụ: "home", "school")
+ */
+
+/**
+ * @typedef {Object} GraphLink
+ * @property {string} source - ID của node nguồn
+ * @property {string} target - ID của node đích
+ * @property {number} weight - Trọng số / độ mạnh của liên kết
+ */
+
+/**
+ * @typedef {Object} GraphData
+ * @property {GraphNode[]} nodes - Mảng các node trong đồ thị
+ * @property {GraphLink[]} links - Mảng các liên kết giữa các node
+ */
+
+/**
+ * @param {GraphData} gData
+ * @param {string} startId
+ * @param {boolean} isDirected
+ * @returns
+ */
 function dijkstraDetailed(gData, startId, isDirected = true) {
+  // Số đỉnh
   const n = gData.nodes.length;
 
+  // Khởi tạo
   const distances = new Array(n).fill(Infinity);
   const previous = new Array(n).fill(null);
   const visited = new Array(n).fill(false);
@@ -20,7 +48,7 @@ function dijkstraDetailed(gData, startId, isDirected = true) {
     });
   }
 
-  // get neighbors of a node
+  // Lấy danh sách đỉnh kề của 1 node
   function getNeighbors(nodeIndex) {
     const neighbors = [];
 
@@ -37,7 +65,6 @@ function dijkstraDetailed(gData, startId, isDirected = true) {
 
       const weight = link.weight ?? 1;
 
-      // Forward edge
       if (sourceIdx === nodeIndex) {
         neighbors.push({ to: targetIdx, weight });
       }
@@ -74,8 +101,9 @@ function dijkstraDetailed(gData, startId, isDirected = true) {
     description: `Initialize: selected node ${gData.nodes[startIndex].name} (index ${startIndex})`,
   });
 
-  // tim cac neighbor cua start node
+  // tim cac neighbor cua START NODE (HOME)
   const startNeighbors = getNeighbors(startIndex);
+  // Loop qua cac neighbor de cap nhat dist va prev
   startNeighbors.forEach(({ to, weight }) => {
     distances[to] = weight;
     previous[to] = startIndex;
@@ -90,6 +118,7 @@ function dijkstraDetailed(gData, startId, isDirected = true) {
     });
   });
 
+  // Mark là visited (Home)
   visited[startIndex] = true;
 
   // loop chinh cua Dijkstra
@@ -97,7 +126,7 @@ function dijkstraDetailed(gData, startId, isDirected = true) {
     let minNode = -1;
     let minDist = Infinity;
 
-    // Find unvisited node with smallest dist
+    //  Tim node chua visit co dist nho nhat
     for (let i = 0; i < n; i++) {
       if (!visited[i] && distances[i] < minDist) {
         minDist = distances[i];

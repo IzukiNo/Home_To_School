@@ -1,6 +1,3 @@
-// Algorithm Visualization Engine
-// Handles step-by-step playback of Dijkstra algorithms
-
 class AlgorithmVisualizer {
   constructor() {
     this.steps = [];
@@ -1077,7 +1074,6 @@ class AlgorithmVisualizer {
       // Keep chosen-node class
     });
   }
-  // Helper function to update select in current row (without creating new row)
   updateSelectInCurrentRow(step) {
     if (!this.currentIterationRow) return;
 
@@ -1135,8 +1131,6 @@ class AlgorithmVisualizer {
     this.pendingSelected = step.chosen;
     console.log("Set pendingSelected to:", this.pendingSelected);
   }
-
-  // Helper to create a "post-select" row where the selected node becomes visited
   createPostSelectRow(step) {
     console.log(
       "createPostSelectRow - Creating row where selected node becomes visited"
