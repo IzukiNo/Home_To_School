@@ -1437,7 +1437,7 @@ function importFromAdjacencyMatrix(matrix) {
   let currentChar = "A";
   for (let i = 1; i < n - 1; i++) {
     const nodeId = currentChar.toLowerCase();
-    const nodeName = `Location ${currentChar}`;
+    const nodeName = `${currentChar}`;
     gData.nodes.push({
       id: nodeId,
       name: nodeName,
