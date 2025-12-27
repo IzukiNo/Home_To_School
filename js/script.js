@@ -1436,7 +1436,7 @@ function importFromAdjacencyMatrix(matrix) {
   // Add middle nodes as A, B, C, etc.
   let currentChar = "A";
   for (let i = 1; i < n - 1; i++) {
-    const nodeId = currentChar.toLowerCase();
+    const nodeId = currentChar.toUpperCase();
     const nodeName = `${currentChar}`;
     gData.nodes.push({
       id: nodeId,
